@@ -1,0 +1,144 @@
+<html>
+  <head>
+    <title>Motor simulator</title>
+	<script type="text/javascript" src="sylvester.js"></script>
+    <script type="text/javascript">
+	  var dt = 1/60;
+	
+	  var theta = 0;
+	  var angVel = 0.5;
+	  
+	  var e_theta;
+	  
+	  var polePairs = 6;
+	  
+	  var center = $V([0,0]);
+	  
+	  var a_ref = $V([1,0]);
+	  var b_ref = a_ref.rotate(Math.PI*2/3,center);
+	  var c_ref = b_ref.rotate(Math.PI*2/3,center);
+	  
+	  var a;
+	  var b;
+	  var c;
+	  
+	  var d;
+	  var q;
+	  
+	  function vectorDraw(ctx, v) {
+	    ctx.beginPath();
+	    ctx.moveTo(0,0);
+		ctx.lineTo(v.elements[0]*100,v.elements[1]*100);
+		ctx.closePath();
+		ctx.stroke();
+	  }
+	  function updateMotor() {
+	    theta += angVel*dt;
+		e_theta = (theta * polePairs);
+		d = $V([1,0]).rotate(e_theta,center);
+		q = $V([0,1]).rotate(e_theta,center);
+		a = a_ref.x(d.dot(a_ref));
+		b = b_ref.x(d.dot(b_ref));
+		c = c_ref.x(d.dot(c_ref));
+	  }
+	  function init() {
+	    setInterval(draw,dt*1000);
+      }
+      function draw(){
+        var canvas = document.getElementById('tutorial');
+		var form = document.forms['motor'];
+		polePairs = form.elements['polePairs'].value;
+		angVel = form.elements['angVel'].value;
+        if (canvas.getContext){
+          var ctx = canvas.getContext('2d');
+		  updateMotor();
+		  ctx.save();
+		  ctx.clearRect(0,0,400,400);
+		  ctx.scale(2,-2);
+		  ctx.translate(100,-100);
+		  
+		  // coil vectors
+		  ctx.save();
+		  ctx.scale(0.25,0.25);
+		  var outerRadius = 300;
+		  for(var i = 0; i < polePairs; i++) {
+			  //ctx.save();
+			    ctx.translate(outerRadius,0);
+			  	ctx.strokeStyle = "#7F7F7F";
+				ctx.lineWidth = 1;
+				vectorDraw(ctx, a_ref);
+				vectorDraw(ctx, a_ref.x(-1));
+				ctx.strokeStyle = "#000000";
+				ctx.lineWidth = 4;
+				vectorDraw(ctx, a);
+				ctx.translate(-1*outerRadius,0);
+			    ctx.rotate(Math.PI*2/3 / polePairs);
+				ctx.translate(outerRadius,0);
+				ctx.strokeStyle = "#7F7F7F";
+				ctx.lineWidth = 1;
+				vectorDraw(ctx, a_ref);
+				vectorDraw(ctx, a_ref.x(-1));
+				ctx.strokeStyle = "#000000";
+				ctx.lineWidth = 4;
+				vectorDraw(ctx, b.rotate(Math.PI*(-2/3),center));
+				ctx.translate(-1*outerRadius,0);
+			    ctx.rotate(Math.PI*2/3 / polePairs);
+				ctx.translate(outerRadius,0);
+				ctx.strokeStyle = "#7F7F7F";
+				ctx.lineWidth = 1;
+				vectorDraw(ctx, a_ref);
+				vectorDraw(ctx, a_ref.x(-1));
+				ctx.strokeStyle = "#000000";
+				ctx.lineWidth = 4;
+				vectorDraw(ctx, c.rotate(Math.PI*(-4/3),center));
+				ctx.translate(-1*outerRadius,0);
+			    ctx.rotate(Math.PI*2/3 / polePairs);
+			  //ctx.restore();
+		  }
+		  ctx.restore();
+		  ctx.rotate(theta-Math.PI/2);
+		 
+		  
+		  // magnets
+		  ctx.beginPath();
+		  ctx.arc(0,0,25,0,Math.PI*2,true);
+		  ctx.stroke();
+		  ctx.closePath();
+		  for (var i = 0; i < polePairs; i++) {
+			ctx.fillStyle = "#FF0000";
+			ctx.fillRect(-25 / polePairs,25,50 / polePairs,10);
+			ctx.rotate(Math.PI / polePairs);
+			ctx.fillStyle = "#0000FF";
+			ctx.fillRect(-25 / polePairs,25,50 / polePairs,10);
+			ctx.rotate(Math.PI / polePairs);
+		  }
+		  
+		  // magnet vector
+		  /*
+		  ctx.beginPath();
+		  ctx.moveTo(0,0);
+		  ctx.lineTo(0,100);
+		  ctx.closePath();
+		  ctx.stroke();
+		  ctx.beginPath();
+		  ctx.moveTo(0,0);
+		  ctx.lineTo(100,0);
+		  ctx.stroke();
+		  */
+		  
+		  ctx.restore();
+        }
+      }
+    </script>
+    <style type="text/css">
+      canvas { border: 1px solid black; }
+    </style>
+  </head>
+  <body onload="init();">
+    <canvas id="tutorial" width="400" height="400"></canvas>
+	<form id="motor">
+	  <label>Pole pairs:</label><input type="range" name="polePairs" min="1" max="10" step="1" value="6">
+	  <label>Angular velocity:</label><input type="range" name="angVel" min="0" max="5" value="0.5">
+	</form>
+  </body>
+</html>
