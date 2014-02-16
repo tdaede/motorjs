@@ -2,6 +2,7 @@
   <head>
     <title>Motor simulator</title>
 	<script type="text/javascript" src="sylvester.js"></script>
+	<script type="text/javascript" src="jquery-2.1.0.min.js"></script>
     <script type="text/javascript">
 	  var dt = 1/60;
 	
@@ -18,12 +19,20 @@
 	  var b_ref = a_ref.rotate(Math.PI*2/3,center);
 	  var c_ref = b_ref.rotate(Math.PI*2/3,center);
 	  
+	  var kt = 1;
+	  var kv = 1;
+	  var J = 1;
+	  var drag = 0.3;
+	  
 	  var a;
 	  var b;
 	  var c;
 	  
 	  var d;
 	  var q;
+	  
+	  var id;
+	  var iq;
 	  
 	  function vectorDraw(ctx, v) {
 	    ctx.beginPath();
@@ -33,6 +42,19 @@
 		ctx.stroke();
 	  }
 	  function updateMotor() {
+	    var form = document.forms['motor'];
+		polePairs = form.elements['polePairs'].value;
+
+	    iq = form.elements['iq'].value;
+		
+		var t = iq * kt - angVel * drag;
+		
+		if (form.elements['loadtype'].value == 'speed') {
+			angVel = parseInt(form.elements['angVel'].value);
+		} else {
+			angVel += (dt * t / J);
+		}
+		
 	    theta += angVel*dt;
 		e_theta = (theta * polePairs);
 		d = $V([1,0]).rotate(e_theta,center);
@@ -40,18 +62,19 @@
 		a = a_ref.x(d.dot(a_ref));
 		b = b_ref.x(d.dot(b_ref));
 		c = c_ref.x(d.dot(c_ref));
+	
+		
+		$("#emf").html(angVel * kv);
+		$("#torque").html(iq * kt);
 	  }
 	  function init() {
 	    setInterval(draw,dt*1000);
       }
       function draw(){
         var canvas = document.getElementById('tutorial');
-		var form = document.forms['motor'];
-		polePairs = form.elements['polePairs'].value;
-		angVel = form.elements['angVel'].value;
+		updateMotor();
         if (canvas.getContext){
           var ctx = canvas.getContext('2d');
-		  updateMotor();
 		  ctx.save();
 		  ctx.clearRect(0,0,400,400);
 		  ctx.scale(2,-2);
@@ -136,9 +159,21 @@
   </head>
   <body onload="init();">
     <canvas id="tutorial" width="400" height="400"></canvas>
+	<div>
+		<label>EMF:</label><span id="emf"></span>
+		<label>Torque:</label><span id="torque"></span>
+	</div>
 	<form id="motor">
+	  <h2>Motor settings:</h2>
 	  <label>Pole pairs:</label><input type="range" name="polePairs" min="1" max="10" step="1" value="6">
+	  <h2>Load settings:</h2>
+	  <label>Load type:</label><select name="loadtype">
+	  <option value="speed">Constant angular velocity</option>
+	  <option value="torque">Constant torque</option>
+	  </select>
 	  <label>Angular velocity:</label><input type="range" name="angVel" min="0" max="5" value="0.5">
+	  <h2>Inverter settings:</h2>
+	  <label>Q-axis current:</label><input type="range" name="iq" min="-5" max="5" value="0">
 	</form>
   </body>
 </html>
