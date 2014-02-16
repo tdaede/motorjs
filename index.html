@@ -22,7 +22,8 @@
 	  var kt = 1;
 	  var kv = 1;
 	  var J = 1;
-	  var drag = 0.3;
+	  var drag = 0.1;
+	  var Rs = 0.1;
 	  
 	  var a;
 	  var b;
@@ -34,6 +35,9 @@
 	  var id;
 	  var iq;
 	  
+	  var vd;
+	  var vq;
+	  
 	  function vectorDraw(ctx, v) {
 	    ctx.beginPath();
 	    ctx.moveTo(0,0);
@@ -44,16 +48,24 @@
 	  function updateMotor() {
 	    var form = document.forms['motor'];
 		polePairs = form.elements['polePairs'].value;
-
-	    iq = form.elements['iq'].value;
+		var loadtorque = parseInt(form.elements['loadtorque'].value);
+	    iq = parseInt(form.elements['iq'].value);
+		var emf = angVel * kv;
+		vq = emf + iq * Rs;
 		
-		var t = iq * kt - angVel * drag;
+		var motor_t = iq * kt - angVel * drag;
 		
 		if (form.elements['loadtype'].value == 'speed') {
+			loadtorque = motor_t;
+			t = 0;
 			angVel = parseInt(form.elements['angVel'].value);
 		} else {
+			t = motor_t - loadtorque;
 			angVel += (dt * t / J);
 		}
+		
+		var power = (iq * vq);
+		var mechpower = angVel * loadtorque;
 		
 	    theta += angVel*dt;
 		e_theta = (theta * polePairs);
@@ -64,8 +76,13 @@
 		c = c_ref.x(d.dot(c_ref));
 	
 		
-		$("#emf").html(angVel * kv);
-		$("#torque").html(iq * kt);
+		$("#emf").html((emf).toFixed(2));
+		$("#torque").html((iq * kt).toFixed(2));
+		$("#power").html(power.toFixed(2));
+		$("#mechpower").html(mechpower.toFixed(2));
+		$("#efficiency").html((mechpower/power*100).toFixed(2));
+		$("#vq").html(vq.toFixed(2));
+		$("#resistanceloss").html((iq*iq*Rs).toFixed(2));
 	  }
 	  function init() {
 	    setInterval(draw,dt*1000);
@@ -160,8 +177,13 @@
   <body onload="init();">
     <canvas id="tutorial" width="400" height="400"></canvas>
 	<div>
-		<label>EMF:</label><span id="emf"></span>
-		<label>Torque:</label><span id="torque"></span>
+		<label>EMF: </label><span id="emf"></span>
+		<label>Voltage: </label><span id="vq"></span>
+		<label>Torque: </label><span id="torque"></span>
+		<label>Electrical Power: </label><span id="power"></span>
+		<label>Mechanical Power: </label><span id="mechpower"></span>
+		<label>Resistance loss: </label><span id="resistanceloss"></span>
+		<label>Efficiency: </label><span id="efficiency"></span>
 	</div>
 	<form id="motor">
 	  <h2>Motor settings:</h2>
@@ -172,8 +194,9 @@
 	  <option value="torque">Constant torque</option>
 	  </select>
 	  <label>Angular velocity:</label><input type="range" name="angVel" min="0" max="5" value="0.5">
+	  <label>Load torque:</label><input type="range" name="loadtorque" min="-100" max="100" value="0">
 	  <h2>Inverter settings:</h2>
-	  <label>Q-axis current:</label><input type="range" name="iq" min="-5" max="5" value="0">
+	  <label>Q-axis current:</label><input type="range" name="iq" min="-100" max="100" value="0">
 	</form>
   </body>
 </html>
