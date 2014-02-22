@@ -1,6 +1,9 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <title>Motor simulator</title>
+	<link rel="stylesheet" href="bootstrap.min.css">
+	<link rel="stylesheet" href="bootstrap-theme.min.css">
 	<script type="text/javascript" src="sylvester.js"></script>
 	<script type="text/javascript" src="jquery-2.1.0.min.js"></script>
     <script type="text/javascript">
@@ -180,30 +183,52 @@
     </style>
   </head>
   <body onload="init();">
-    <canvas id="tutorial" width="400" height="400"></canvas>
-	<div>
-	    <label>RPM: </label><span id="rpm"></span>
-		<label>EMF: </label><span id="emf"></span>
-		<label>Voltage: </label><span id="vq"></span>
-		<label>Torque: </label><span id="torque"></span>
-		<label>Electrical Power: </label><span id="power"></span>
-		<label>Mechanical Power: </label><span id="mechpower"></span>
-		<label>Resistance loss: </label><span id="resistanceloss"></span>
-		<label>Bearing loss: </label><span id="bearingloss"></span>
-		<label>Efficiency: </label><span id="efficiency"></span>
+    <div class="container">
+	<div class="row">
+    <canvas id="tutorial" width="400" height="400" class="col-md-4"></canvas>
+	<div class="col-md-4">
+		<table class="table">
+		<tr>
+			<td>RPM: </td><td id="rpm"></td>
+		</tr>
+		<tr><td>EMF: </td><td id="emf"></td></tr>
+		<tr><td>Voltage: </td><td id="vq"></td></tr>
+		<tr><td>Torque: </td><td id="torque"></td></tr>
+		<tr><td>Electrical Power: </td><td id="power"></td></tr>
+		<tr><td>Mechanical Power: </td><td id="mechpower"></td></tr>
+		<tr><td>Resistance loss: </td><td id="resistanceloss"></td></tr>
+		<tr><td>Bearing loss: </td><td id="bearingloss"></td></tr>
+		<tr><td>Efficiency: </td><td id="efficiency"></td></tr>
+		</table>
 	</div>
-	<form id="motor">
+	</div>
+	<div class="row">
+	<form id="motor" role="form">
+	  <div class="col-md-4">
 	  <h2>Motor settings:</h2>
-	  <label>Pole pairs:</label><input type="range" name="polePairs" min="1" max="10" step="1" value="6">
+	  <div class="form-group">
+		<label for="polePairs">Pole pairs:</label><input type="range" id="polePairs" name="polePairs" min="1" max="10" step="1" value="6">
+	  </div>
+	  </div>
+	  <div class="col-md-4">
 	  <h2>Load settings:</h2>
-	  <label>Load type:</label><select name="loadtype">
+	  <div class="form-group">
+	  <label>Load type:</label><select name="loadtype" class="form-control">
 	  <option value="speed">Constant angular velocity</option>
 	  <option value="torque">Constant torque</option>
 	  </select>
-	  <label>Angular velocity:</label><input type="range" name="angVel" min="0" max="5" value="0.5">
+	  </div>
+	  <div class="form-group">
+	  <label for="angVel">Angular velocity:</label><input type="range" name="angVel" id="angVel" min="0" max="5" value="0.5">
+	  </div>
 	  <label>Load torque:</label><input type="range" name="loadtorque" min="-100" max="100" value="0">
+	  </div>
+	  <div class="col-md-4">
 	  <h2>Inverter settings:</h2>
 	  <label>Q-axis current:</label><input type="range" name="iq" min="-100" max="100" value="0">
+	  </div>
 	</form>
+	</div>
+	</div>
   </body>
 </html>
