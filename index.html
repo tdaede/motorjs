@@ -243,15 +243,19 @@
       }
     </script>
     <style type="text/css">
-      canvas { border: 1px solid black; }
+      canvas { 
+		border: 1px solid black;
+		position: relative;
+		width: 100%;
+	  }
     </style>
   </head>
   <body onload="init();">
     <div class="container">
 	<div class="row">
-    <canvas id="tutorial" width="400" height="400" class="col-md-4"></canvas>
-	<div class="col-md-4" id="silly-3d">Controls: Drag to rotate</div>
-	<div class="col-md-4">
+    <div class="col-sm-4"><canvas id="tutorial" width="400" height="400"></canvas></div>
+	<div class="col-sm-4" id="silly-3d"></div>
+	<div class="col-sm-4">
 		<table class="table">
 		<tr>
 			<td>Speed: </td><td id="rpm"></td><td>RPM</td>
