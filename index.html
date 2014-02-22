@@ -6,6 +6,8 @@
 	<link rel="stylesheet" href="bootstrap-theme.min.css">
 	<script type="text/javascript" src="sylvester.js"></script>
 	<script type="text/javascript" src="jquery-2.1.0.min.js"></script>
+	<script type="text/javascript" src="three.min.js"></script>
+	<script type="text/javascript" src="OrbitControls.js"></script>
     <script type="text/javascript">
 	  var dt = 1/60;
 	
@@ -102,13 +104,57 @@
 			$("body").css("padding-left", Math.random()*angVel/100);
 		}
 	  }
+	  	var scene = new THREE.Scene();
+		var camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
+		var rotor = new THREE.Object3D();
+		
+		light = new THREE.DirectionalLight( 0xffffff );
+		light.position.set( 1, 1, 1 );
+		scene.add( light );
+		light = new THREE.DirectionalLight( 0x555555 );
+		light.position.set( -1, -1, -1 );
+		scene.add( light );
+		light = new THREE.AmbientLight( 0x222222 );
+		scene.add( light );
+
+		var renderer = new THREE.WebGLRenderer();
+		renderer.setSize( 300,300 );
+		renderer.setClearColor(0xFFFFFF, 1);
+	  function init3D() {
+		$("#silly-3d").append( renderer.domElement );
+		var controls = new THREE.OrbitControls( camera, renderer.domElement );
+		var form = document.forms['motor'];
+		polePairs = parseInt(form.elements['polePairs'].value);;
+		
+		var magnet_geometry = new THREE.CubeGeometry(1,1,1);
+		var magnet_north_material = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
+		var magnet_south_material = new THREE.MeshLambertMaterial( { color: 0x0000FF } );
+		for (var i = 0; i < polePairs; i++) {
+			var north = new THREE.Mesh( magnet_geometry, magnet_north_material );
+			north.rotateOnAxis(new THREE.Vector3(0,0,1), (i/polePairs)*2*Math.PI);
+			north.translateX(3);
+			rotor.add( north );
+			var south = new THREE.Mesh( magnet_geometry, magnet_south_material );
+			south.rotateOnAxis(new THREE.Vector3(0,0,1), (i/polePairs+(0.5/polePairs))*2*Math.PI);
+			south.translateX(3);
+			rotor.add( south );
+		}
+		scene.add(rotor);
+		camera.position.z = 10;
+	  }
+	  function draw3D() {
+	    rotor.rotation = new THREE.Euler(0,0, theta, 'XYZ');
+	  	renderer.render(scene, camera);
+      }
 	  function init() {
 	    setInterval(draw,dt*1000);
+		init3D();
       }
       function draw(){
         var canvas = document.getElementById('tutorial');
 		updateMotor();
 		updateForms();
+		draw3D();
         if (canvas.getContext){
           var ctx = canvas.getContext('2d');
 		  ctx.save();
@@ -197,6 +243,7 @@
     <div class="container">
 	<div class="row">
     <canvas id="tutorial" width="400" height="400" class="col-md-4"></canvas>
+	<div class="col-md-4" id="silly-3d">Controls: Drag to rotate</div>
 	<div class="col-md-4">
 		<table class="table">
 		<tr>
