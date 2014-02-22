@@ -61,7 +61,7 @@
 	  function updateMotor() {
 	    var form = document.forms['motor'];
 		polePairs = form.elements['polePairs'].value;
-		var loadtorque = parseInt(form.elements['loadtorque'].value);
+		var loadtorque = parseFloat(form.elements['loadtorque'].value);
 	    iq = parseInt(form.elements['iq'].value);
 		var emf = angVel * kv;
 		vq = emf + iq * Rs;
@@ -71,7 +71,7 @@
 		if (form.elements['loadtype'].value == 'speed') {
 			loadtorque = motor_t;
 			t = 0;
-			angVel = parseInt(form.elements['angVel'].value);
+			angVel = parseFloat(form.elements['angVel'].value);
 		} else {
 			t = motor_t - loadtorque;
 			angVel += (dt * t / J);
@@ -230,7 +230,7 @@
 	  </select>
 	  </div>
 	  <div class="form-group" id="angVel-control">
-	  <label for="angVel">Angular velocity:</label><input type="range" name="angVel" id="angVel" min="0" max="5" value="0.5">
+	  <label for="angVel">Angular velocity:</label><input type="range" name="angVel" id="angVel" min="0" max="5" value="1" step="0.01">
 	  </div>
 	  <div class="form-group" id="loadtorque-control">
 	  <label>Load torque:</label><input type="range" name="loadtorque" min="-100" max="100" value="0">
