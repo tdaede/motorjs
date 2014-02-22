@@ -8,6 +8,7 @@
 	<script type="text/javascript" src="jquery-2.1.0.min.js"></script>
 	<script type="text/javascript" src="three.min.js"></script>
 	<script type="text/javascript" src="OrbitControls.js"></script>
+  <script type="text/javascript" src="OBJLoader.js"></script>
   <script type="text/javascript">
 	  var dt = 1/60;
 	
@@ -15,6 +16,10 @@
     motor.state = new Object();
 	  motor.state.theta = 0;
 	  motor.state.angVel = 0.5;
+    
+    var load = new Object();
+    load.car = new Object();
+    load.car.airDrag = 0.1;
 
 	  var defaultParams = {
 	    polePairs: 6,
@@ -61,9 +66,12 @@
       if (form.elements['loadtype'].value == 'speed') {
         $("#angVel-control").show();
         $("#loadtorque-control").hide();
-      } else {
+      } else if (form.elements['loadtype'].value == 'torque') {
         $("#angVel-control").hide();
         $("#loadtorque-control").show();
+      } else {
+        $("#angVel-control").hide();
+        $("#loadtorque-control").hide();
       }
 	  }
 	  function updateMotor() {
@@ -80,11 +88,17 @@
         loadtorque = motor_t;
         t = 0;
         motor.state.angVel = parseFloat(form.elements['angVel'].value);
-      } else {
+      } else if (form.elements['loadtype'].value == 'torque') {
         t = motor_t - loadtorque;
         motor.state.angVel += (dt * t / motor.params.J);
+      } else {
+        var windTorque = motor.state.angVel*motor.state.angVel*load.car.airDrag;
+        if (motor.state.angVel < 0) {
+          windTorque *= -1;
+        }
+        t = motor_t - windTorque;
+        motor.state.angVel += (dt * t / motor.params.J);
       }
-      
       var power = (iq * vq);
       var mechpower = motor.state.angVel * loadtorque;
       
@@ -113,6 +127,12 @@
 	  	var scene = new THREE.Scene();
 		var camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
 		var rotor = new THREE.Object3D();
+    var manager = new THREE.LoadingManager();
+    var loader = new THREE.OBJLoader( manager );
+    loader.load( 'obj/d1_ee_motor_rotor_may23.obj', function ( object ) {
+      object.rotateOnAxis(new THREE.Vector3(0,-1,0), Math.PI/2);
+      rotor.add( object );
+    } );
 		
 		light = new THREE.DirectionalLight( 0xffffff );
 		light.position.set( 1, 1, 1 );
@@ -138,11 +158,11 @@
 		for (var i = 0; i < motor.params.polePairs; i++) {
 			var north = new THREE.Mesh( magnet_geometry, magnet_north_material );
 			north.rotateOnAxis(new THREE.Vector3(0,0,1), (i/motor.params.polePairs)*2*Math.PI);
-			north.translateX(3);
+			north.translateX(4.5);
 			rotor.add( north );
 			var south = new THREE.Mesh( magnet_geometry, magnet_south_material );
 			south.rotateOnAxis(new THREE.Vector3(0,0,1), (i/motor.params.polePairs+(0.5/motor.params.polePairs))*2*Math.PI);
-			south.translateX(3);
+			south.translateX(4.5);
 			rotor.add( south );
 		}
 		scene.add(rotor);
@@ -289,6 +309,7 @@
               <select name="loadtype" class="form-control">
                 <option value="speed">Constant angular velocity</option>
                 <option value="torque">Constant torque</option>
+                <option value="car">Car load</option>
               </select>
             </div>
             <div class="form-group" id="angVel-control">
