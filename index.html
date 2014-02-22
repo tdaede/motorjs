@@ -175,7 +175,6 @@
         ctx.scale(0.25,0.25);
         var outerRadius = 300;
         for(var i = 0; i < motor.params.polePairs; i++) {
-          //ctx.save();
           ctx.translate(outerRadius,0);
           ctx.strokeStyle = "#7F7F7F";
           ctx.lineWidth = 1;
@@ -206,7 +205,6 @@
           vectorDraw(ctx, c.rotate(Math.PI*(-4/3),center));
           ctx.translate(-1*outerRadius,0);
           ctx.rotate(Math.PI*2/3 / motor.params.polePairs);
-          //ctx.restore();
         }
         ctx.restore();
         ctx.rotate(motor.state.theta-Math.PI/2);
@@ -218,12 +216,12 @@
         ctx.stroke();
         ctx.closePath();
         for (var i = 0; i < motor.params.polePairs; i++) {
-        ctx.fillStyle = "#FF0000";
-        ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
-        ctx.rotate(Math.PI / motor.params.polePairs);
-        ctx.fillStyle = "#0000FF";
-        ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
-        ctx.rotate(Math.PI / motor.params.polePairs);
+          ctx.fillStyle = "#FF0000";
+          ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
+          ctx.rotate(Math.PI / motor.params.polePairs);
+          ctx.fillStyle = "#0000FF";
+          ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
+          ctx.rotate(Math.PI / motor.params.polePairs);
         }
         
         // magnet vector
@@ -254,54 +252,53 @@
   </head>
   <body onload="init();">
     <div class="container">
-	<div class="row">
-    <div class="col-sm-4"><canvas id="tutorial" width="400" height="400"></canvas></div>
-	<div class="col-sm-4" id="silly-3d"></div>
-	<div class="col-sm-4">
-		<table class="table">
-		<tr>
-			<td>Speed: </td><td id="rpm"></td><td>RPM</td>
-		</tr>
-		<tr><td>EMF: </td><td id="emf"></td><td>V</td></tr>
-		<tr><td>Voltage: </td><td id="vq"></td><td>V</td></tr>
-		<tr><td>Torque: </td><td id="torque"></td><td>Nm</td></tr>
-		<tr><td>Electrical Power: </td><td id="power"></td><td>W</td></tr>
-		<tr><td>Mechanical Power: </td><td id="mechpower"></td><td>W</td></tr>
-		<tr><td>Resistance loss: </td><td id="resistanceloss"></td><td>W</td></tr>
-		<tr><td>Bearing loss: </td><td id="bearingloss"></td><td>W</td></tr>
-		<tr><td>Efficiency: </td><td id="efficiency"></td><td>%</td></tr>
-		</table>
-	</div>
-	</div>
-	<div class="row">
-	<form id="motor" role="form">
-	  <div class="col-md-4">
-	  <h2>Motor settings:</h2>
-	  <div class="form-group">
-		<label for="polePairs">Pole pairs:</label><input type="range" id="polePairs" name="polePairs" min="1" max="10" step="1" value="6">
-	  </div>
-	  </div>
-	  <div class="col-md-4">
-	  <h2>Load settings:</h2>
-	  <div class="form-group">
-	  <label>Load type:</label><select name="loadtype" class="form-control">
-	  <option value="speed">Constant angular velocity</option>
-	  <option value="torque">Constant torque</option>
-	  </select>
-	  </div>
-	  <div class="form-group" id="angVel-control">
-	  <label for="angVel">Angular velocity:</label><input type="range" name="angVel" id="angVel" min="0" max="120" value="1" step="0.01">
-	  </div>
-	  <div class="form-group" id="loadtorque-control">
-	  <label>Load torque:</label><input type="range" name="loadtorque" min="-100" max="100" value="0">
-	  </div>
-	  </div>
-	  <div class="col-md-4">
-	  <h2>Inverter settings:</h2>
-	  <label>Q-axis current:</label><input type="range" name="iq" min="-100" max="100" value="0">
-	  </div>
-	</form>
-	</div>
-	</div>
+      <div class="row">
+      <div class="col-sm-4"><canvas id="tutorial" width="400" height="400"></canvas></div>
+      <div class="col-sm-4" id="silly-3d"></div>
+      <div class="col-sm-4">
+      <table class="table">
+      <tr><td>Speed: </td><td id="rpm"></td><td>RPM</td></tr>
+      <tr><td>EMF: </td><td id="emf"></td><td>V</td></tr>
+      <tr><td>Voltage: </td><td id="vq"></td><td>V</td></tr>
+      <tr><td>Torque: </td><td id="torque"></td><td>Nm</td></tr>
+      <tr><td>Electrical Power: </td><td id="power"></td><td>W</td></tr>
+      <tr><td>Mechanical Power: </td><td id="mechpower"></td><td>W</td></tr>
+      <tr><td>Resistance loss: </td><td id="resistanceloss"></td><td>W</td></tr>
+      <tr><td>Bearing loss: </td><td id="bearingloss"></td><td>W</td></tr>
+      <tr><td>Efficiency: </td><td id="efficiency"></td><td>%</td></tr>
+      </table>
+      </div>
+      </div>
+      <div class="row">
+        <form id="motor" role="form">
+          <div class="col-md-4">
+            <h2>Motor settings:</h2>
+            <div class="form-group">
+              <label for="polePairs">Pole pairs:</label><input type="range" id="polePairs" name="polePairs" min="1" max="10" step="1" value="6">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <h2>Load settings:</h2>
+            <div class="form-group">
+              <label>Load type:</label>
+              <select name="loadtype" class="form-control">
+                <option value="speed">Constant angular velocity</option>
+                <option value="torque">Constant torque</option>
+              </select>
+            </div>
+            <div class="form-group" id="angVel-control">
+              <label for="angVel">Angular velocity:</label><input type="range" name="angVel" id="angVel" min="0" max="120" value="1" step="0.01">
+            </div>
+            <div class="form-group" id="loadtorque-control">
+              <label>Load torque:</label><input type="range" name="loadtorque" min="-100" max="100" value="0">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <h2>Inverter settings:</h2>
+            <label>Q-axis current:</label><input type="range" name="iq" min="-100" max="100" value="0">
+          </div>
+        </form>
+      </div>
+    </div>
   </body>
 </html>
