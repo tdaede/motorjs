@@ -147,10 +147,16 @@
 	  	renderer.render(scene, camera);
       }
 	  function init() {
-	    setInterval(draw,dt*1000);
+	    window.requestAnimationFrame(draw);
 		init3D();
       }
-      function draw(){
+	  var lasttime = null;
+      function draw(timestamp){
+	    if (lasttime != null) {
+		  dt = (timestamp - lasttime)/1000;
+		}
+	    lasttime = timestamp;
+		
         var canvas = document.getElementById('tutorial');
 		updateMotor();
 		updateForms();
@@ -233,6 +239,7 @@
 		  
 		  ctx.restore();
         }
+		window.requestAnimationFrame(draw);
       }
     </script>
     <style type="text/css">
