@@ -13,17 +13,21 @@
 	
     var motor = new Object();
     motor.state = new Object();
-    motor.params = new Object();
 	  motor.state.theta = 0;
 	  motor.state.angVel = 0.5;
 
-	  
-	  motor.params.polePairs = 6;
-    motor.params.kt = 1;
-	  motor.params.kv = 1;
-	  motor.params.J = 1;
-	  motor.params.drag = 0.1;
-	  motor.params.Rs = 0.1;
+	  var defaultParams = {
+	    polePairs: 6,
+      kt: 1,
+	    kv: 1,
+	    J: 1,
+	    drag: 0.1,
+	    Rs: 0.1
+    };
+    motor.params = defaultParams;
+    function resetMotor() {
+      motor.params = defaultParams;
+    }
 	  
 	  var center = $V([0,0]);
 	  
@@ -273,6 +277,7 @@
         <form id="motor" role="form">
           <div class="col-md-4">
             <h2>Motor settings:</h2>
+            <!--<button type="button" onclick="resetMotor()">Reset</button>-->
             <div class="form-group">
               <label for="polePairs">Pole pairs:</label><input type="range" id="polePairs" name="polePairs" min="1" max="10" step="1" value="6">
             </div>
