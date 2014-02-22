@@ -75,7 +75,7 @@
 		b = b_ref.x(d.dot(b_ref));
 		c = c_ref.x(d.dot(c_ref));
 	
-		
+		$("#rpm").html((angVel * 9.5493).toFixed(2));
 		$("#emf").html((emf).toFixed(2));
 		$("#torque").html((iq * kt).toFixed(2));
 		$("#power").html(power.toFixed(2));
@@ -83,6 +83,11 @@
 		$("#efficiency").html((mechpower/power*100).toFixed(2));
 		$("#vq").html(vq.toFixed(2));
 		$("#resistanceloss").html((iq*iq*Rs).toFixed(2));
+		$("#bearingloss").html((angVel*drag*angVel).toFixed(2));
+		
+		if (angVel > 200) {
+			$("body").css("padding-left", Math.random()*angVel/100);
+		}
 	  }
 	  function init() {
 	    setInterval(draw,dt*1000);
@@ -177,12 +182,14 @@
   <body onload="init();">
     <canvas id="tutorial" width="400" height="400"></canvas>
 	<div>
+	    <label>RPM: </label><span id="rpm"></span>
 		<label>EMF: </label><span id="emf"></span>
 		<label>Voltage: </label><span id="vq"></span>
 		<label>Torque: </label><span id="torque"></span>
 		<label>Electrical Power: </label><span id="power"></span>
 		<label>Mechanical Power: </label><span id="mechpower"></span>
 		<label>Resistance loss: </label><span id="resistanceloss"></span>
+		<label>Bearing loss: </label><span id="bearingloss"></span>
 		<label>Efficiency: </label><span id="efficiency"></span>
 	</div>
 	<form id="motor">
