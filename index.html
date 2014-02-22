@@ -48,6 +48,16 @@
 		ctx.closePath();
 		ctx.stroke();
 	  }
+	  function updateForms() {
+	    var form = document.forms['motor'];
+	    if (form.elements['loadtype'].value == 'speed') {
+		  $("#angVel-control").show();
+		  $("#loadtorque-control").hide();
+		} else {
+		  $("#angVel-control").hide();
+		  $("#loadtorque-control").show();
+		}
+	  }
 	  function updateMotor() {
 	    var form = document.forms['motor'];
 		polePairs = form.elements['polePairs'].value;
@@ -98,6 +108,7 @@
       function draw(){
         var canvas = document.getElementById('tutorial');
 		updateMotor();
+		updateForms();
         if (canvas.getContext){
           var ctx = canvas.getContext('2d');
 		  ctx.save();
@@ -218,10 +229,12 @@
 	  <option value="torque">Constant torque</option>
 	  </select>
 	  </div>
-	  <div class="form-group">
+	  <div class="form-group" id="angVel-control">
 	  <label for="angVel">Angular velocity:</label><input type="range" name="angVel" id="angVel" min="0" max="5" value="0.5">
 	  </div>
+	  <div class="form-group" id="loadtorque-control">
 	  <label>Load torque:</label><input type="range" name="loadtorque" min="-100" max="100" value="0">
+	  </div>
 	  </div>
 	  <div class="col-md-4">
 	  <h2>Inverter settings:</h2>
