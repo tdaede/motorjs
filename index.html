@@ -11,24 +11,26 @@
   <script type="text/javascript">
 	  var dt = 1/60;
 	
-	  var theta = 0;
-	  var angVel = 0.5;
+    var motor = new Object();
+    motor.state = new Object();
+    motor.params = new Object();
+	  motor.state.theta = 0;
+	  motor.state.angVel = 0.5;
+
 	  
-	  var e_theta;
-	  
-	  var polePairs = 6;
+	  motor.params.polePairs = 6;
+    motor.params.kt = 1;
+	  motor.params.kv = 1;
+	  motor.params.J = 1;
+	  motor.params.drag = 0.1;
+	  motor.params.Rs = 0.1;
 	  
 	  var center = $V([0,0]);
 	  
 	  var a_ref = $V([1,0]);
 	  var b_ref = a_ref.rotate(Math.PI*2/3,center);
 	  var c_ref = b_ref.rotate(Math.PI*2/3,center);
-	  
-	  var kt = 1;
-	  var kv = 1;
-	  var J = 1;
-	  var drag = 0.1;
-	  var Rs = 0.1;
+	 
 	  
 	  var a;
 	  var b;
@@ -62,46 +64,46 @@
 	  }
 	  function updateMotor() {
 	    var form = document.forms['motor'];
-      polePairs = form.elements['polePairs'].value;
+      motor.params.polePairs = form.elements['polePairs'].value;
       var loadtorque = parseFloat(form.elements['loadtorque'].value);
         iq = parseInt(form.elements['iq'].value);
-      var emf = angVel * kv;
-      vq = emf + iq * Rs;
+      var emf = motor.state.angVel * motor.params.kv;
+      vq = emf + iq * motor.params.Rs;
       
-      var motor_t = iq * kt - angVel * drag;
+      var motor_t = iq * motor.params.kt - motor.state.angVel * motor.params.drag;
       
       if (form.elements['loadtype'].value == 'speed') {
         loadtorque = motor_t;
         t = 0;
-        angVel = parseFloat(form.elements['angVel'].value);
+        motor.state.angVel = parseFloat(form.elements['angVel'].value);
       } else {
         t = motor_t - loadtorque;
-        angVel += (dt * t / J);
+        motor.state.angVel += (dt * t / motor.params.J);
       }
       
       var power = (iq * vq);
-      var mechpower = angVel * loadtorque;
+      var mechpower = motor.state.angVel * loadtorque;
       
-      theta += angVel*dt;
-      e_theta = (theta * polePairs);
-      d = $V([1,0]).rotate(e_theta,center);
-      q = $V([0,1]).rotate(e_theta,center);
+      motor.state.theta += motor.state.angVel*dt;
+      motor.state.e_theta = (motor.state.theta * motor.params.polePairs);
+      d = $V([1,0]).rotate(motor.state.e_theta,center);
+      q = $V([0,1]).rotate(motor.state.e_theta,center);
       a = a_ref.x(d.dot(a_ref));
       b = b_ref.x(d.dot(b_ref));
       c = c_ref.x(d.dot(c_ref));
     
-      $("#rpm").html((angVel * 9.5493).toFixed(2));
+      $("#rpm").html((motor.state.angVel * 9.5493).toFixed(2));
       $("#emf").html((emf).toFixed(2));
-      $("#torque").html((iq * kt).toFixed(2));
+      $("#torque").html((iq * motor.params.kt).toFixed(2));
       $("#power").html(power.toFixed(2));
       $("#mechpower").html(mechpower.toFixed(2));
       $("#efficiency").html((mechpower/power*100).toFixed(2));
       $("#vq").html(vq.toFixed(2));
-      $("#resistanceloss").html((iq*iq*Rs).toFixed(2));
-      $("#bearingloss").html((angVel*drag*angVel).toFixed(2));
+      $("#resistanceloss").html((iq*iq*motor.params.Rs).toFixed(2));
+      $("#bearingloss").html((motor.state.angVel*motor.params.drag*motor.state.angVel).toFixed(2));
       
-      if (angVel > 200) {
-        $("body").css("padding-left", Math.random()*angVel/100);
+      if (motor.state.angVel > 200) {
+        $("body").css("padding-left", Math.random()*motor.state.angVel/100);
       }
 	  }
 	  	var scene = new THREE.Scene();
@@ -124,18 +126,18 @@
 		$("#silly-3d").append( renderer.domElement );
 		var controls = new THREE.OrbitControls( camera, renderer.domElement );
 		var form = document.forms['motor'];
-		polePairs = parseInt(form.elements['polePairs'].value);;
+		motor.params.polePairs = parseInt(form.elements['polePairs'].value);;
 		
 		var magnet_geometry = new THREE.CubeGeometry(1,1,1);
 		var magnet_north_material = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
 		var magnet_south_material = new THREE.MeshLambertMaterial( { color: 0x0000FF } );
-		for (var i = 0; i < polePairs; i++) {
+		for (var i = 0; i < motor.params.polePairs; i++) {
 			var north = new THREE.Mesh( magnet_geometry, magnet_north_material );
-			north.rotateOnAxis(new THREE.Vector3(0,0,1), (i/polePairs)*2*Math.PI);
+			north.rotateOnAxis(new THREE.Vector3(0,0,1), (i/motor.params.polePairs)*2*Math.PI);
 			north.translateX(3);
 			rotor.add( north );
 			var south = new THREE.Mesh( magnet_geometry, magnet_south_material );
-			south.rotateOnAxis(new THREE.Vector3(0,0,1), (i/polePairs+(0.5/polePairs))*2*Math.PI);
+			south.rotateOnAxis(new THREE.Vector3(0,0,1), (i/motor.params.polePairs+(0.5/motor.params.polePairs))*2*Math.PI);
 			south.translateX(3);
 			rotor.add( south );
 		}
@@ -143,7 +145,7 @@
 		camera.position.z = 10;
 	  }
 	  function draw3D() {
-	    rotor.rotation = new THREE.Euler(0,0, theta, 'XYZ');
+	    rotor.rotation = new THREE.Euler(0,0, motor.state.theta, 'XYZ');
 	  	renderer.render(scene, camera);
       }
 	  function init() {
@@ -172,7 +174,7 @@
         ctx.save();
         ctx.scale(0.25,0.25);
         var outerRadius = 300;
-        for(var i = 0; i < polePairs; i++) {
+        for(var i = 0; i < motor.params.polePairs; i++) {
           //ctx.save();
           ctx.translate(outerRadius,0);
           ctx.strokeStyle = "#7F7F7F";
@@ -183,7 +185,7 @@
           ctx.lineWidth = 4;
           vectorDraw(ctx, a);
           ctx.translate(-1*outerRadius,0);
-          ctx.rotate(Math.PI*2/3 / polePairs);
+          ctx.rotate(Math.PI*2/3 / motor.params.polePairs);
           ctx.translate(outerRadius,0);
           ctx.strokeStyle = "#7F7F7F";
           ctx.lineWidth = 1;
@@ -193,7 +195,7 @@
           ctx.lineWidth = 4;
           vectorDraw(ctx, b.rotate(Math.PI*(-2/3),center));
           ctx.translate(-1*outerRadius,0);
-          ctx.rotate(Math.PI*2/3 / polePairs);
+          ctx.rotate(Math.PI*2/3 / motor.params.polePairs);
           ctx.translate(outerRadius,0);
           ctx.strokeStyle = "#7F7F7F";
           ctx.lineWidth = 1;
@@ -203,11 +205,11 @@
           ctx.lineWidth = 4;
           vectorDraw(ctx, c.rotate(Math.PI*(-4/3),center));
           ctx.translate(-1*outerRadius,0);
-          ctx.rotate(Math.PI*2/3 / polePairs);
+          ctx.rotate(Math.PI*2/3 / motor.params.polePairs);
           //ctx.restore();
         }
         ctx.restore();
-        ctx.rotate(theta-Math.PI/2);
+        ctx.rotate(motor.state.theta-Math.PI/2);
        
         
         // magnets
@@ -215,13 +217,13 @@
         ctx.arc(0,0,25,0,Math.PI*2,true);
         ctx.stroke();
         ctx.closePath();
-        for (var i = 0; i < polePairs; i++) {
+        for (var i = 0; i < motor.params.polePairs; i++) {
         ctx.fillStyle = "#FF0000";
-        ctx.fillRect(-25 / polePairs,25,50 / polePairs,10);
-        ctx.rotate(Math.PI / polePairs);
+        ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
+        ctx.rotate(Math.PI / motor.params.polePairs);
         ctx.fillStyle = "#0000FF";
-        ctx.fillRect(-25 / polePairs,25,50 / polePairs,10);
-        ctx.rotate(Math.PI / polePairs);
+        ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
+        ctx.rotate(Math.PI / motor.params.polePairs);
         }
         
         // magnet vector
