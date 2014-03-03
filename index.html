@@ -90,6 +90,7 @@
       motor.params.polePairs = parseInt(form.elements['polePairs'].value);
       motor.params.kv = parseFloat(form.elements['kv'].value);
       motor.params.kt = parseFloat(form.elements['kt'].value);
+      motor.params.Rs = parseFloat(form.elements['rs'].value);
       motor.loadtorque = parseFloat(form.elements['loadtorque'].value);
       motor.iq = parseInt(form.elements['iq'].value);
       motor.vq = parseFloat(form.elements['vq'].value);
@@ -273,6 +274,9 @@
             </div>
             <div class="form-group">
               <label for="kt">Kt:</label><input class="form-control" type="number" id="kt" name="kt" min="1" max="10" step="0.01" value="1">
+            </div>
+            <div class="form-group">
+              <label for="rs">Rs:</label><input class="form-control" type="number" id="rs" name="rs" min="1" max="10" step="0.01" value="0.1">
             </div>
           </div>
           <div class="col-md-4">
