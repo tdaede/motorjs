@@ -58,12 +58,12 @@ motor.update = function (dt) {
     
   if (this.loadtype == 'car') {
     this.loadtorque = motor.state.angVel*motor.state.angVel*load.car.airDrag;
-    if (this.state.angVel < 0) {
+    if (this.state.angVel > 0) {
       this.loadtorque *= -1;
     }
   }
   
-  var t = this.motor_t - this.loadtorque;
+  var t = this.motor_t + this.loadtorque;
   
   if (this.loadtype == 'speed') {
     this.state.angVel = this.loadVel;
@@ -100,14 +100,18 @@ function updateMotor() {
   $("#torque").html((motor.motor_t).toFixed(2));
   $("#power").html(power.toFixed(2));
   $("#mechpower").html(mechpower.toFixed(2));
-  $("#efficiency").html((mechpower/power*100).toFixed(2));
+  if (motor.motor_t * motor.state.angVel > 0) {
+    $("#efficiency").html(Math.abs(mechpower/power*100).toFixed(2));
+  } else {
+    $("#efficiency").html(Math.abs(power/mechpower*100).toFixed(2));
+  }
   $("#vq").html(motor.vq.toFixed(2));
   $("#iq").html(motor.iq.toFixed(2));
 
   $("#resistanceloss").html((motor.iq*motor.iq*motor.params.Rs).toFixed(2));
   $("#bearingloss").html((motor.state.angVel*motor.params.drag*motor.state.angVel).toFixed(2));
   
-  if (motor.motor_t * motor.loadtorque > 0) {
+  if (motor.motor_t * motor.state.angVel > 0) {
     $("#region").html("Motoring");
   } else {
     $("#region").html("Braking");
