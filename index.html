@@ -10,6 +10,7 @@
 	<script type="text/javascript" src="OrbitControls.js"></script>
   <script type="text/javascript" src="OBJLoader.js"></script>
   <script type="text/javascript" src="knockout-3.0.0.js"></script>
+  <script type="text/javascript" src="dyno3d.js"></script>
   <script type="text/javascript">
 	  var dt = 1/60;
 	
@@ -18,14 +19,21 @@
 	  motor.state.theta = 0;
 	  motor.state.angVel = 0.5;
     
-    var load = new Object();
+    var load = {
+      torque: ko.observable(0)
+    };
     load.car = new Object();
     load.car.airDrag = 0.1;
     
     var drive = {
       motor: motor,
-      load: load
+      load: load,
+      inverter: {
+        iq: ko.observable(0)
+      }
     };
+    
+    var inverter = drive.inverter;
 
     
 
@@ -84,12 +92,12 @@
 	  }
 	  function updateMotor() {
 	    var form = document.forms['motor'];
-      var loadtorque = parseFloat(form.elements['loadtorque'].value);
-        iq = parseInt(form.elements['iq'].value);
-      var emf = motor.state.angVel * motor.params.kv;
-      vq = emf + iq * motor.params.Rs;
+      var loadtorque = parseFloat(load.torque());
+      iq = parseFloat(inverter.iq());
+      var emf = motor.state.angVel * motor.params.kv();
+      vq = emf + iq * motor.params.Rs();
       
-      var motor_t = iq * motor.params.kt - motor.state.angVel * motor.params.drag;
+      var motor_t = iq * motor.params.kt() - motor.state.angVel * motor.params.drag();
       
       if (form.elements['loadtype'].value == 'speed') {
         loadtorque = motor_t;
@@ -97,14 +105,14 @@
         motor.state.angVel = parseFloat(form.elements['angVel'].value);
       } else if (form.elements['loadtype'].value == 'torque') {
         t = motor_t - loadtorque;
-        motor.state.angVel += (dt * t / motor.params.J);
+        motor.state.angVel += (dt * t / motor.params.J());
       } else {
         var windTorque = motor.state.angVel*motor.state.angVel*load.car.airDrag;
         if (motor.state.angVel < 0) {
           windTorque *= -1;
         }
         t = motor_t - windTorque;
-        motor.state.angVel += (dt * t / motor.params.J);
+        motor.state.angVel += (dt * t / motor.params.J());
       }
       var power = (iq * vq);
       var mechpower = motor.state.angVel * loadtorque;
@@ -119,65 +127,19 @@
     
       $("#rpm").html((motor.state.angVel * 9.5493).toFixed(2));
       $("#emf").html((emf).toFixed(2));
-      $("#torque").html((iq * motor.params.kt).toFixed(2));
+      $("#torque").html((iq * motor.params.kt()).toFixed(2));
       $("#power").html(power.toFixed(2));
       $("#mechpower").html(mechpower.toFixed(2));
       $("#efficiency").html((mechpower/power*100).toFixed(2));
       $("#vq").html(vq.toFixed(2));
-      $("#resistanceloss").html((iq*iq*motor.params.Rs).toFixed(2));
-      $("#bearingloss").html((motor.state.angVel*motor.params.drag*motor.state.angVel).toFixed(2));
+      $("#resistanceloss").html((iq*iq*motor.params.Rs()).toFixed(2));
+      $("#bearingloss").html((motor.state.angVel*motor.params.drag()*motor.state.angVel).toFixed(2));
       
       if (motor.state.angVel > 200) {
         $("body").css("padding-left", Math.random()*motor.state.angVel/100);
       }
 	  }
-	  	var scene = new THREE.Scene();
-		var camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
-		var rotor = new THREE.Object3D();
-    var manager = new THREE.LoadingManager();
-    var loader = new THREE.OBJLoader( manager );
-    loader.load( 'obj/d1_ee_motor_rotor_may23.obj', function ( object ) {
-      object.rotateOnAxis(new THREE.Vector3(0,-1,0), Math.PI/2);
-      rotor.add( object );
-    } );
-		
-		light = new THREE.DirectionalLight( 0xffffff );
-		light.position.set( 1, 1, 1 );
-		scene.add( light );
-		light = new THREE.DirectionalLight( 0x555555 );
-		light.position.set( -1, -1, -1 );
-		scene.add( light );
-		light = new THREE.AmbientLight( 0x222222 );
-		scene.add( light );
 
-		var renderer = new THREE.WebGLRenderer();
-		renderer.setSize( 300,300 );
-		renderer.setClearColor(0xFFFFFF, 1);
-	  function init3D() {
-		$("#silly-3d").append( renderer.domElement );
-		var controls = new THREE.OrbitControls( camera, renderer.domElement );
-		var form = document.forms['motor'];
-		
-		var magnet_geometry = new THREE.CubeGeometry(1,1,1);
-		var magnet_north_material = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
-		var magnet_south_material = new THREE.MeshLambertMaterial( { color: 0x0000FF } );
-		for (var i = 0; i < motor.params.polePairs(); i++) {
-			var north = new THREE.Mesh( magnet_geometry, magnet_north_material );
-			north.rotateOnAxis(new THREE.Vector3(0,0,1), (i/motor.params.polePairs())*2*Math.PI);
-			north.translateX(4.5);
-			rotor.add( north );
-			var south = new THREE.Mesh( magnet_geometry, magnet_south_material );
-			south.rotateOnAxis(new THREE.Vector3(0,0,1), (i/motor.params.polePairs()+(0.5/motor.params.polePairs()))*2*Math.PI);
-			south.translateX(4.5);
-			rotor.add( south );
-		}
-		scene.add(rotor);
-		camera.position.z = 10;
-	  }
-	  function draw3D() {
-	    rotor.rotation = new THREE.Euler(0,0, motor.state.theta, 'XYZ');
-	  	renderer.render(scene, camera);
-      }
 	  function init() {
       ko.applyBindings(drive);
 	    window.requestAnimationFrame(draw);
@@ -323,12 +285,12 @@
               <label for="angVel">Angular velocity:</label><input type="range" name="angVel" id="angVel" min="0" max="120" value="1" step="0.01">
             </div>
             <div class="form-group" id="loadtorque-control">
-              <label>Load torque:</label><input type="range" name="loadtorque" min="-100" max="100" value="0">
+              <label>Load torque:</label><input data-bind="value: load.torque" type="range" name="loadtorque" min="-100" max="100" value="0">
             </div>
           </div>
           <div class="col-md-4">
             <h2>Inverter settings:</h2>
-            <label>Q-axis current:</label><input type="range" name="iq" min="-100" max="100" value="0">
+            <label>Q-axis current:</label><input data-bind="value: inverter.iq" type="range" name="iq" min="-100" max="100" value="0">
           </div>
         </form>
       </div>
