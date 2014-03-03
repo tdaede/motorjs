@@ -127,8 +127,8 @@
         $("#region").html("Braking");
       }
       
-      if (motor.state.angVel > 200) {
-        $("body").css("padding-left", Math.random()*motor.state.angVel/100);
+      if (Math.abs(motor.state.angVel) > 200) {
+        $("body").css("padding-left", Math.random()*Math.abs(motor.state.angVel)/100);
       }
     }
 	  function draw3D() {
