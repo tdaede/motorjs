@@ -49,21 +49,20 @@ motor.update = function (dt) {
   var motor_t = this.iq * this.params.kt - this.state.angVel * this.params.drag;
   this.emf = motor.state.angVel * motor.params.kv;
   this.vq = this.emf + this.iq * this.params.Rs;
+    
+  if (this.loadtype == 'car') {
+    this.loadtorque = motor.state.angVel*motor.state.angVel*load.car.airDrag;
+    if (this.state.angVel < 0) {
+      this.loadtorque *= -1;
+    }
+  }
+  
+  var t = motor_t - this.loadtorque;
   
   if (this.loadtype == 'speed') {
-    this.loadtorque = motor_t;
-    t = 0;
     this.state.angVel = this.loadVel;
-  } else if (this.loadtype == 'torque') {
-    t = motor_t - this.loadtorque;
-    this.state.angVel += (dt * t / motor.params.J);
   } else {
-    var windTorque = motor.state.angVel*motor.state.angVel*load.car.airDrag;
-    if (this.state.angVel < 0) {
-      windTorque *= -1;
-    }
-    t = motor_t - windTorque;
-    this.state.angVel += (dt * t / this.params.J);
+    this.state.angVel += (dt * t / motor.params.J);
   }
   
   this.state.theta += this.state.angVel*dt;
