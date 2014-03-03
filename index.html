@@ -9,6 +9,7 @@
 	<script type="text/javascript" src="three.min.js"></script>
 	<script type="text/javascript" src="OrbitControls.js"></script>
   <script type="text/javascript" src="OBJLoader.js"></script>
+  <script type="text/javascript" src="knockout-3.0.0.js"></script>
   <script type="text/javascript">
 	  var dt = 1/60;
 	
@@ -20,14 +21,21 @@
     var load = new Object();
     load.car = new Object();
     load.car.airDrag = 0.1;
+    
+    var drive = {
+      motor: motor,
+      load: load
+    };
+
+    
 
 	  var defaultParams = {
-	    polePairs: 6,
-      kt: 1,
-	    kv: 1,
-	    J: 1,
-	    drag: 0.1,
-	    Rs: 0.1
+	    polePairs: ko.observable(6),
+      kt: ko.observable(1),
+	    kv: ko.observable(1),
+	    J: ko.observable(1),
+	    drag: ko.observable(0.1),
+	    Rs: ko.observable(0.1)
     };
     motor.params = defaultParams;
     function resetMotor() {
@@ -76,7 +84,6 @@
 	  }
 	  function updateMotor() {
 	    var form = document.forms['motor'];
-      motor.params.polePairs = form.elements['polePairs'].value;
       var loadtorque = parseFloat(form.elements['loadtorque'].value);
         iq = parseInt(form.elements['iq'].value);
       var emf = motor.state.angVel * motor.params.kv;
@@ -103,7 +110,7 @@
       var mechpower = motor.state.angVel * loadtorque;
       
       motor.state.theta += motor.state.angVel*dt;
-      motor.state.e_theta = (motor.state.theta * motor.params.polePairs);
+      motor.state.e_theta = (motor.state.theta * motor.params.polePairs());
       d = $V([1,0]).rotate(motor.state.e_theta,center);
       q = $V([0,1]).rotate(motor.state.e_theta,center);
       a = a_ref.x(d.dot(a_ref));
@@ -150,18 +157,17 @@
 		$("#silly-3d").append( renderer.domElement );
 		var controls = new THREE.OrbitControls( camera, renderer.domElement );
 		var form = document.forms['motor'];
-		motor.params.polePairs = parseInt(form.elements['polePairs'].value);;
 		
 		var magnet_geometry = new THREE.CubeGeometry(1,1,1);
 		var magnet_north_material = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
 		var magnet_south_material = new THREE.MeshLambertMaterial( { color: 0x0000FF } );
-		for (var i = 0; i < motor.params.polePairs; i++) {
+		for (var i = 0; i < motor.params.polePairs(); i++) {
 			var north = new THREE.Mesh( magnet_geometry, magnet_north_material );
-			north.rotateOnAxis(new THREE.Vector3(0,0,1), (i/motor.params.polePairs)*2*Math.PI);
+			north.rotateOnAxis(new THREE.Vector3(0,0,1), (i/motor.params.polePairs())*2*Math.PI);
 			north.translateX(4.5);
 			rotor.add( north );
 			var south = new THREE.Mesh( magnet_geometry, magnet_south_material );
-			south.rotateOnAxis(new THREE.Vector3(0,0,1), (i/motor.params.polePairs+(0.5/motor.params.polePairs))*2*Math.PI);
+			south.rotateOnAxis(new THREE.Vector3(0,0,1), (i/motor.params.polePairs()+(0.5/motor.params.polePairs()))*2*Math.PI);
 			south.translateX(4.5);
 			rotor.add( south );
 		}
@@ -173,6 +179,7 @@
 	  	renderer.render(scene, camera);
       }
 	  function init() {
+      ko.applyBindings(drive);
 	    window.requestAnimationFrame(draw);
       init3D();
     }
@@ -198,7 +205,7 @@
         ctx.save();
         ctx.scale(0.25,0.25);
         var outerRadius = 300;
-        for(var i = 0; i < motor.params.polePairs; i++) {
+        for(var i = 0; i < motor.params.polePairs(); i++) {
           ctx.translate(outerRadius,0);
           ctx.strokeStyle = "#7F7F7F";
           ctx.lineWidth = 1;
@@ -208,7 +215,7 @@
           ctx.lineWidth = 4;
           vectorDraw(ctx, a);
           ctx.translate(-1*outerRadius,0);
-          ctx.rotate(Math.PI*2/3 / motor.params.polePairs);
+          ctx.rotate(Math.PI*2/3 / motor.params.polePairs());
           ctx.translate(outerRadius,0);
           ctx.strokeStyle = "#7F7F7F";
           ctx.lineWidth = 1;
@@ -218,7 +225,7 @@
           ctx.lineWidth = 4;
           vectorDraw(ctx, b.rotate(Math.PI*(-2/3),center));
           ctx.translate(-1*outerRadius,0);
-          ctx.rotate(Math.PI*2/3 / motor.params.polePairs);
+          ctx.rotate(Math.PI*2/3 / motor.params.polePairs());
           ctx.translate(outerRadius,0);
           ctx.strokeStyle = "#7F7F7F";
           ctx.lineWidth = 1;
@@ -228,7 +235,7 @@
           ctx.lineWidth = 4;
           vectorDraw(ctx, c.rotate(Math.PI*(-4/3),center));
           ctx.translate(-1*outerRadius,0);
-          ctx.rotate(Math.PI*2/3 / motor.params.polePairs);
+          ctx.rotate(Math.PI*2/3 / motor.params.polePairs());
         }
         ctx.restore();
         ctx.rotate(motor.state.theta-Math.PI/2);
@@ -239,13 +246,13 @@
         ctx.arc(0,0,25,0,Math.PI*2,true);
         ctx.stroke();
         ctx.closePath();
-        for (var i = 0; i < motor.params.polePairs; i++) {
+        for (var i = 0; i < motor.params.polePairs(); i++) {
           ctx.fillStyle = "#FF0000";
-          ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
-          ctx.rotate(Math.PI / motor.params.polePairs);
+          ctx.fillRect(-25 / motor.params.polePairs(),25,50 / motor.params.polePairs(),10);
+          ctx.rotate(Math.PI / motor.params.polePairs());
           ctx.fillStyle = "#0000FF";
-          ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
-          ctx.rotate(Math.PI / motor.params.polePairs);
+          ctx.fillRect(-25 / motor.params.polePairs(),25,50 / motor.params.polePairs(),10);
+          ctx.rotate(Math.PI / motor.params.polePairs());
         }
         
         // magnet vector
@@ -299,7 +306,7 @@
             <h2>Motor settings:</h2>
             <!--<button type="button" onclick="resetMotor()">Reset</button>-->
             <div class="form-group">
-              <label for="polePairs">Pole pairs:</label><input type="range" id="polePairs" name="polePairs" min="1" max="10" step="1" value="6">
+              <label for="polePairs">Pole pairs:</label><input type="range" id="polePairs" name="polePairs" data-bind="value: motor.params.polePairs" min="1" max="10" step="1" value="6">
             </div>
           </div>
           <div class="col-md-4">
