@@ -1,6 +1,9 @@
 var dt = 1/60;
 
-var motor = new Object();
+var motor = {
+  iq: 0,
+  loadtype: ''
+}
 motor.state = new Object();
 motor.state.theta = 0;
 motor.state.angVel = 0.5;
@@ -42,36 +45,44 @@ var iq;
 var vd;
 var vq;
 
-function updateMotor() {
-  var form = document.forms['motor'];
-  motor.params.polePairs = form.elements['polePairs'].value;
-  var loadtorque = parseFloat(form.elements['loadtorque'].value);
-    iq = parseInt(form.elements['iq'].value);
-  var emf = motor.state.angVel * motor.params.kv;
-  vq = emf + iq * motor.params.Rs;
+motor.update = function (dt) {
+  var motor_t = this.iq * this.params.kt - this.state.angVel * this.params.drag;
+  this.emf = motor.state.angVel * motor.params.kv;
+  this.vq = this.emf + this.iq * this.params.Rs;
   
-  var motor_t = iq * motor.params.kt - motor.state.angVel * motor.params.drag;
-  
-  if (form.elements['loadtype'].value == 'speed') {
-    loadtorque = motor_t;
+  if (this.loadtype == 'speed') {
+    this.loadtorque = motor_t;
     t = 0;
-    motor.state.angVel = parseFloat(form.elements['angVel'].value);
-  } else if (form.elements['loadtype'].value == 'torque') {
-    t = motor_t - loadtorque;
-    motor.state.angVel += (dt * t / motor.params.J);
+    this.state.angVel = this.loadVel;
+  } else if (this.loadtype == 'torque') {
+    t = motor_t - this.loadtorque;
+    this.state.angVel += (dt * t / motor.params.J);
   } else {
     var windTorque = motor.state.angVel*motor.state.angVel*load.car.airDrag;
-    if (motor.state.angVel < 0) {
+    if (this.state.angVel < 0) {
       windTorque *= -1;
     }
     t = motor_t - windTorque;
-    motor.state.angVel += (dt * t / motor.params.J);
+    this.state.angVel += (dt * t / this.params.J);
   }
-  var power = (iq * vq);
-  var mechpower = motor.state.angVel * loadtorque;
   
-  motor.state.theta += motor.state.angVel*dt;
-  motor.state.e_theta = (motor.state.theta * motor.params.polePairs);
+  this.state.theta += this.state.angVel*dt;
+  this.state.e_theta = (this.state.theta * this.params.polePairs);
+}
+
+function updateMotor() {
+  var form = document.forms['motor'];
+  motor.params.polePairs = form.elements['polePairs'].value;
+  motor.loadtorque = parseFloat(form.elements['loadtorque'].value);
+  motor.iq = parseInt(form.elements['iq'].value);
+  motor.loadVel = parseFloat(form.elements['angVel'].value);
+  motor.loadtype = form.elements['loadtype'].value;
+  
+  motor.update(dt);
+
+  var power = (iq * vq);
+  var mechpower = motor.state.angVel * motor.loadtorque;
+  
   d = $V([1,0]).rotate(motor.state.e_theta,center);
   q = $V([0,1]).rotate(motor.state.e_theta,center);
   a = a_ref.x(d.dot(a_ref));
@@ -79,12 +90,12 @@ function updateMotor() {
   c = c_ref.x(d.dot(c_ref));
 
   $("#rpm").html((motor.state.angVel * 9.5493).toFixed(2));
-  $("#emf").html((emf).toFixed(2));
+  $("#emf").html((motor.emf).toFixed(2));
   $("#torque").html((iq * motor.params.kt).toFixed(2));
   $("#power").html(power.toFixed(2));
   $("#mechpower").html(mechpower.toFixed(2));
   $("#efficiency").html((mechpower/power*100).toFixed(2));
-  $("#vq").html(vq.toFixed(2));
+  $("#vq").html(motor.vq.toFixed(2));
   $("#resistanceloss").html((iq*iq*motor.params.Rs).toFixed(2));
   $("#bearingloss").html((motor.state.angVel*motor.params.drag*motor.state.angVel).toFixed(2));
   
