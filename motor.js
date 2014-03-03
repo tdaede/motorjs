@@ -53,8 +53,8 @@ motor.update = function (dt) {
     this.iq = (this.vq - this.emf) / this.params.Rs;
   }
   
-  //this.motor_t = this.iq * this.params.kt - this.state.angVel * this.params.drag;
-  this.motor_t = this.iq * this.params.kt;
+  this.motor_t = this.iq * this.params.kt - this.state.angVel * this.params.drag;
+  //this.motor_t = this.iq * this.params.kt;
     
   if (this.loadtype == 'car') {
     this.loadtorque = motor.state.angVel*motor.state.angVel*load.car.airDrag;

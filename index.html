@@ -32,6 +32,13 @@
         $("#angVel-control").hide();
         $("#loadtorque-control").hide();
       }
+      if (form.elements['drivetype'].value == 'voltage') {
+        $("#vq-control").show();
+        $("#iq-control").hide();
+      } else {
+        $("#vq-control").hide();
+        $("#iq-control").show();
+      }
 	  }
 
 	  	var scene = new THREE.Scene();
@@ -243,7 +250,7 @@
             <div class="form-group" id="iq-control">
               <label>Q-axis current:</label><input type="range" name="iq" min="-100" max="100" value="0">
             </div>
-            <div class="form-group" id="iq-control">
+            <div class="form-group" id="vq-control">
               <label>Q-axis voltage:</label><input type="range" name="vq" min="-100" max="100" value="0">
             </div>
           </div>
