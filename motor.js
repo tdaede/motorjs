@@ -10,7 +10,8 @@ motor.state.angVel = 0.5;
 
 var load = new Object();
 load.car = new Object();
-load.car.airDrag = 0.1;
+load.car.airDrag = 0.13568;  
+load.car.wheelRadius = 0.25;
 
 var defaultParams = {
   polePairs: 6,
@@ -59,7 +60,7 @@ motor.update = function (dt) {
   }
     
   if (this.loadtype == 'car') {
-    this.loadtorque = motor.state.angVel*motor.state.angVel*load.car.airDrag;
+    this.loadtorque = 0.5*1.164*motor.state.angVel*motor.state.angVel*load.car.airDrag*load.car.wheelRadius;
     if (this.state.angVel > 0) {
       this.loadtorque *= -1;
     }
