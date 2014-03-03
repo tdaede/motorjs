@@ -46,9 +46,15 @@ var vd;
 var vq;
 
 motor.update = function (dt) {
-  var motor_t = this.iq * this.params.kt - this.state.angVel * this.params.drag;
   this.emf = motor.state.angVel * motor.params.kv;
-  this.vq = this.emf + this.iq * this.params.Rs;
+  if (this.drivetype == 'current') {
+    this.vq = this.emf + this.iq * this.params.Rs;
+  } else {
+    this.iq = (this.vq - this.emf) / this.params.Rs;
+  }
+  
+  //this.motor_t = this.iq * this.params.kt - this.state.angVel * this.params.drag;
+  this.motor_t = this.iq * this.params.kt;
     
   if (this.loadtype == 'car') {
     this.loadtorque = motor.state.angVel*motor.state.angVel*load.car.airDrag;
@@ -57,7 +63,7 @@ motor.update = function (dt) {
     }
   }
   
-  var t = motor_t - this.loadtorque;
+  var t = this.motor_t - this.loadtorque;
   
   if (this.loadtype == 'speed') {
     this.state.angVel = this.loadVel;
@@ -74,12 +80,13 @@ function updateMotor() {
   motor.params.polePairs = form.elements['polePairs'].value;
   motor.loadtorque = parseFloat(form.elements['loadtorque'].value);
   motor.iq = parseInt(form.elements['iq'].value);
+  motor.vq = parseFloat(form.elements['vq'].value);
   motor.loadVel = parseFloat(form.elements['angVel'].value);
   motor.loadtype = form.elements['loadtype'].value;
-  
+  motor.drivetype = form.elements['drivetype'].value;
   motor.update(dt);
 
-  var power = (iq * vq);
+  var power = (motor.iq * motor.vq);
   var mechpower = motor.state.angVel * motor.loadtorque;
   
   d = $V([1,0]).rotate(motor.state.e_theta,center);
@@ -90,13 +97,21 @@ function updateMotor() {
 
   $("#rpm").html((motor.state.angVel * 9.5493).toFixed(2));
   $("#emf").html((motor.emf).toFixed(2));
-  $("#torque").html((iq * motor.params.kt).toFixed(2));
+  $("#torque").html((motor.motor_t).toFixed(2));
   $("#power").html(power.toFixed(2));
   $("#mechpower").html(mechpower.toFixed(2));
   $("#efficiency").html((mechpower/power*100).toFixed(2));
   $("#vq").html(motor.vq.toFixed(2));
-  $("#resistanceloss").html((iq*iq*motor.params.Rs).toFixed(2));
+  $("#iq").html(motor.iq.toFixed(2));
+
+  $("#resistanceloss").html((motor.iq*motor.iq*motor.params.Rs).toFixed(2));
   $("#bearingloss").html((motor.state.angVel*motor.params.drag*motor.state.angVel).toFixed(2));
+  
+  if (motor.motor_t * motor.loadtorque > 0) {
+    $("#region").html("Motoring");
+  } else {
+    $("#region").html("Braking");
+  }
   
   if (motor.state.angVel > 200) {
     $("body").css("padding-left", Math.random()*motor.state.angVel/100);

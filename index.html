@@ -194,12 +194,14 @@
       <tr><td>Speed: </td><td id="rpm"></td><td>RPM</td></tr>
       <tr><td>EMF: </td><td id="emf"></td><td>V</td></tr>
       <tr><td>Voltage: </td><td id="vq"></td><td>V</td></tr>
+      <tr><td>Current: </td><td id="iq"></td><td>A</td></tr>
       <tr><td>Torque: </td><td id="torque"></td><td>Nm</td></tr>
       <tr><td>Electrical Power: </td><td id="power"></td><td>W</td></tr>
       <tr><td>Mechanical Power: </td><td id="mechpower"></td><td>W</td></tr>
       <tr><td>Resistance loss: </td><td id="resistanceloss"></td><td>W</td></tr>
       <tr><td>Bearing loss: </td><td id="bearingloss"></td><td>W</td></tr>
       <tr><td>Efficiency: </td><td id="efficiency"></td><td>%</td></tr>
+      <tr><td>Operation region: </td><td id="region"></td><td></td></tr>
       </table>
       </div>
       </div>
@@ -209,7 +211,7 @@
             <h2>Motor settings:</h2>
             <!--<button type="button" onclick="resetMotor()">Reset</button>-->
             <div class="form-group">
-              <label for="polePairs">Pole pairs:</label><input type="range" id="polePairs" name="polePairs" min="1" max="10" step="1" value="6">
+              <label for="polePairs">Pole pairs:</label><input class="form-control" type="number" id="polePairs" name="polePairs" min="1" max="10" step="1" value="6">
             </div>
           </div>
           <div class="col-md-4">
@@ -231,7 +233,19 @@
           </div>
           <div class="col-md-4">
             <h2>Inverter settings:</h2>
-            <label>Q-axis current:</label><input type="range" name="iq" min="-100" max="100" value="0">
+            <div class="form-group">
+              <label>Drive type:</label>
+              <select name="drivetype" class="form-control">
+                <option value="current">Current</option>
+                <option value="voltage">Voltage</option>
+              </select>
+            </div>
+            <div class="form-group" id="iq-control">
+              <label>Q-axis current:</label><input type="range" name="iq" min="-100" max="100" value="0">
+            </div>
+            <div class="form-group" id="iq-control">
+              <label>Q-axis voltage:</label><input type="range" name="vq" min="-100" max="100" value="0">
+            </div>
           </div>
         </form>
       </div>
