@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+  <meta charset="UTF-8">
   <title>Motor simulator</title>
 	<link rel="stylesheet" href="bootstrap.min.css">
 	<link rel="stylesheet" href="bootstrap-theme.min.css">
@@ -91,7 +92,7 @@
       var form = document.forms['motor'];
       motor.params.polePairs = parseInt(form.elements['polePairs'].value);
       motor.params.kv = parseFloat(form.elements['kv'].value);
-      motor.params.kt = parseFloat(form.elements['kt'].value);
+      motor.params.kt = motor.params.kv;
       motor.params.Rs = parseFloat(form.elements['rs'].value);
       motor.loadtorque = parseFloat(form.elements['loadtorque'].value);
       motor.iq = parseInt(form.elements['iq'].value);
@@ -306,13 +307,10 @@
               <label for="polePairs">Pole pairs:</label><input class="form-control" type="number" id="polePairs" name="polePairs" min="1" max="10" step="1" value="6">
             </div>
             <div class="form-group">
-              <label for="kv">Kv:</label><input class="form-control" type="number" id="kv" name="kv" min="1" max="10" step="0.01" value="1">
+              <label for="kv">Ke:</label><div class="input-group"><input class="form-control" type="number" id="kv" name="kv" min="1" max="10" step="0.01" value="1"><div class="input-group-addon">Vs/rad</div></div>
             </div>
             <div class="form-group">
-              <label for="kt">Kt:</label><input class="form-control" type="number" id="kt" name="kt" min="1" max="10" step="0.01" value="1">
-            </div>
-            <div class="form-group">
-              <label for="rs">Rs:</label><input class="form-control" type="number" id="rs" name="rs" min="1" max="10" step="0.01" value="0.1">
+              <label for="rs">Rs:</label><div class="input-group"><input class="form-control" type="number" id="rs" name="rs" min="1" max="10" step="0.01" value="0.1"><div class="input-group-addon">Ω</div></div>
             </div>
           </div>
           <div class="col-md-4">
