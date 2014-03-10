@@ -148,6 +148,10 @@
     function draw(timestamp){
 	    if (lasttime != null) {
         dt = (timestamp - lasttime)/1000;
+        var slomo = parseFloat($("#slomo").val())
+        if (isFinite(slomo)) {
+          dt = dt / slomo;
+        }
 		  }
 	    lasttime = timestamp;
 		
@@ -248,6 +252,12 @@
       <nav class="navbar navbar-default">
         <div class="container-fluid">
           <span class="navbar-brand">MotorJS</span>
+          <form class="navbar-form" role="form">
+            <div class="form-group">
+              <label>Slo-mo:</label>
+              <input id="slomo" type="number" class="form-control" value="1"></input>
+            </div>
+          </form>
         </div>
       </nav>
       <div class="row">
