@@ -75,5 +75,5 @@ motor.update = function (dt) {
   }
   
   this.state.theta += this.state.angVel*dt;
-  this.state.e_theta = (this.state.theta * this.params.polePairs);
+  this.state.e_theta = (this.state.theta * this.params.polePairs) % (Math.PI * 2);
 }
