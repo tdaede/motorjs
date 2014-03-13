@@ -11,7 +11,8 @@ scope.draw = function() {
   } else {
     data = a.dot(a_ref);
   }
-  if (motor.state.e_theta < this.last_theta) {
+  if (((motor.state.angVel > 0) && (motor.state.e_theta < this.last_theta)) ||
+      ((motor.state.angVel < 0) && (motor.state.e_theta > this.last_theta))) {
     $.plot($("#scope-chart"),[this.scopeData], {
       xaxis: {
         min: 0,
