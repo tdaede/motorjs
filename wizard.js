@@ -1,6 +1,7 @@
 var magnetThickness = 0.005;
 var gapLength = 0.001;
 var statorThickness = 0.005;
+var magnetMass;
 
 function updateMass() {
 	var outerRadius = parseFloat($('#mw-or').val());
@@ -18,12 +19,13 @@ function updateMass() {
 	
 	var magnetDensity = 7500;
 	var magnetVolume = (Math.PI*outerRadius*outerRadius-Math.PI*innerRadius*innerRadius)*magnetThickness;
-	var magnetMass = magnetVolume * magnetDensity;
+	magnetMass = magnetVolume * magnetDensity;
 	
 	$('#mw-mass').val(rotorMass*numRotors + statorMass*numStators + magnetMass*numRotors);
 }
 
 function updateFlux() {
+	updateMass();
 	var outerRadius = parseFloat($('#mw-or').val());
 	var innerRadius = parseFloat($('#mw-ir').val());
 	
@@ -40,4 +42,7 @@ function updateFlux() {
 	
 	var field = flux / area;
 	$('#mw-field').html(field);
+	
+	var cost = magnetMass * 300;
+	$('#mw-magnet-cost').html(cost);
 }
