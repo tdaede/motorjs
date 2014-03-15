@@ -7,6 +7,8 @@ function updateMass() {
 	var outerRadius = parseFloat($('#mw-or').val());
 	var innerRadius = parseFloat($('#mw-ir').val());
 	magnetThickness = parseFloat($('#mw-magnet-thickness').val());
+	gapLength = parseFloat($('#mw-airgap').val());
+	statorThickness = parseFloat($('#mw-stator-thickness').val());
 	var rotorThickness = 0.005;
 	var rotorVolume = Math.PI*outerRadius*outerRadius*rotorThickness;
 	var steelDensity = 8050;
@@ -29,6 +31,7 @@ function updateFlux() {
 	updateMass();
 	var outerRadius = parseFloat($('#mw-or').val());
 	var innerRadius = parseFloat($('#mw-ir').val());
+	var turns = parseFloat($('#mw-turns').val());
 	
 	var Br = 1.45;
 	var Hc = 891300;
@@ -46,4 +49,12 @@ function updateFlux() {
 	
 	var cost = magnetMass * 300;
 	$('#mw-magnet-cost').html(cost);
+	
+	// calculate ke
+	var kw = 0.933; // winding factor, calculate via winding pattern?
+	var magnetPoleArc = Math.PI;
+	var p = motor.params.polePairs;
+	var fluxPerPole = flux/p/2;
+	var ke = 2/3*kw*turns*fluxPerPole*p/magnetPoleArc;
+	$('#mw-ke').html(ke);
 }
