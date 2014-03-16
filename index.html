@@ -214,12 +214,22 @@
         ctx.arc(0,0,25,0,Math.PI*2,true);
         ctx.stroke();
         ctx.closePath();
+        var magnetEArcLength = Math.PI*3/4;
         for (var i = 0; i < motor.params.polePairs; i++) {
-          ctx.fillStyle = "#FF0000";
-          ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
+		  ctx.lineWidth = 10;
+          ctx.strokeStyle = "#FF0000";
+          ctx.beginPath();
+          ctx.arc(0,0,30,0,magnetEArcLength/motor.params.polePairs);
+          ctx.stroke();
+          ctx.closePath();
+          //ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
           ctx.rotate(Math.PI / motor.params.polePairs);
-          ctx.fillStyle = "#0000FF";
-          ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
+          ctx.strokeStyle = "#0000FF";
+          ctx.beginPath();
+          ctx.arc(0,0,30,0,magnetEArcLength/motor.params.polePairs);
+          ctx.stroke();
+          ctx.closePath();
+          //ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
           ctx.rotate(Math.PI / motor.params.polePairs);
         }
         
