@@ -8,8 +8,10 @@ scope.draw = function() {
   var data;
   if ($("#yaxis").val() == "motor_t") {
     data = motor.motor_t;
+  } else if ($("#yaxis").val() == "ea") {
+    data = motor.fluxA - this.lastFluxA;
   } else {
-    data = a.dot(a_ref);
+    data = motor.fluxA;
   }
   if (((motor.state.angVel > 0) && (motor.state.e_theta < this.last_theta)) ||
       ((motor.state.angVel < 0) && (motor.state.e_theta > this.last_theta))) {
@@ -24,4 +26,5 @@ scope.draw = function() {
     this.scopeData.push([motor.state.e_theta,data]);
   }
   this.last_theta = motor.state.e_theta;
+  this.lastFluxA = motor.fluxA;
 };

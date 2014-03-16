@@ -46,7 +46,46 @@ var iq;
 var vd;
 var vq;
 
+function angleDifference(x, y) {
+  return Math.atan2(Math.sin(x-y), Math.cos(x-y))
+}
+
 motor.update = function (dt) {
+  var numWindings = 3 * motor.params.polePairs;
+  var polePairs = motor.params.polePairs;
+  var magnets = [];
+  
+  for (var i = 0; i < (polePairs*2); i++) {
+    var magnet = new Object();
+    magnet.center = i * Math.PI / polePairs + motor.state.theta;
+    if (i % 2) {
+      magnet.B = 1;
+    } else {
+      magnet.B = -1;
+    }
+    magnets.push(magnet);
+  }
+  
+  var coils = [];
+  var coilWidth = Math.PI/numWindings;
+  var magnetWidth = motor.params.magnetArc/polePairs;
+  for (var i = 0; i < (numWindings); i++) {
+    var coil = new Object();
+    coil.center = i * Math.PI * 2 / 3 / polePairs;
+    coil.flux = 0;
+    for (var j = coilWidth/-2; j < coilWidth/2; j += 0.01) {
+      var location = j + coil.center;
+      for (magnetNum in magnets) {
+        if (Math.abs(angleDifference(location,magnets[magnetNum].center)) < magnetWidth / 2) {
+          coil.flux += magnets[magnetNum].B;
+        }
+      }
+    }
+    coils.push(coil);
+  }
+  
+  this.fluxA = coils[0].flux;
+  
   this.emf = motor.state.angVel * motor.params.kv;
   if (this.drivetype == 'current') {
     this.vq = this.emf + this.iq * this.params.Rs;
