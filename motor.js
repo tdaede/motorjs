@@ -51,14 +51,14 @@ function angleDifference(x, y) {
 }
 
 motor.lookupFlux = function(theta) {
-  var i = (Math.abs(theta) % (Math.PI*2))/2/Math.PI*this.thetaPrecision;
+  var i = (angleDifference(0,theta)+Math.PI)/2/Math.PI*this.thetaPrecision;
   var j = Math.floor(i);
   var k = i % 1;
   return this.fluxALookup[j]*(1-k) + this.fluxALookup[j+1]*k;
 }
 
 motor.lookupEmf = function(theta) {
-  var i = (Math.abs(theta) % (Math.PI*2))/2/Math.PI*this.thetaPrecision;
+  var i = (angleDifference(0,theta)+Math.PI)/2/Math.PI*this.thetaPrecision;
   var j = Math.floor(i);
   var k = i % 1;
   return this.emfALookup[j]*(1-k) + this.emfALookup[j+1]*k;
