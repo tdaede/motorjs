@@ -50,21 +50,26 @@ function angleDifference(x, y) {
   return Math.atan2(Math.sin(x-y), Math.cos(x-y))
 }
 
-motor.update = function (dt) {
-  var numWindings = 3 * motor.params.polePairs;
+motor.regenerate = function() {
   var polePairs = motor.params.polePairs;
-  var magnets = [];
+  this.magnets = [];
   
   for (var i = 0; i < (polePairs*2); i++) {
     var magnet = new Object();
-    magnet.center = i * Math.PI / polePairs + motor.state.theta;
+    magnet.center = i * Math.PI / polePairs;
     if (i % 2) {
       magnet.B = 1;
     } else {
       magnet.B = -1;
     }
-    magnets.push(magnet);
+    this.magnets.push(magnet);
   }
+}  
+
+motor.update = function (dt) {
+  this.regenerate();
+  var numWindings = 3 * motor.params.polePairs;
+  var polePairs = motor.params.polePairs;
   
   var coils = [];
   var coilWidth = Math.PI/numWindings;
@@ -75,9 +80,9 @@ motor.update = function (dt) {
     coil.flux = 0;
     for (var j = coilWidth/-2; j < coilWidth/2; j += 0.01) {
       var location = j + coil.center;
-      for (magnetNum in magnets) {
-        if (Math.abs(angleDifference(location,magnets[magnetNum].center)) < magnetWidth / 2) {
-          coil.flux += magnets[magnetNum].B;
+      for (magnetNum in this.magnets) {
+        if (Math.abs(angleDifference(location,this.magnets[magnetNum].center + motor.state.theta)) < magnetWidth / 2) {
+          coil.flux += this.magnets[magnetNum].B;
         }
       }
     }
@@ -85,6 +90,8 @@ motor.update = function (dt) {
   }
   
   this.fluxA = coils[0].flux;
+  this.emfA = (this.fluxA - this.lastFluxA)*dt;
+  this.lastFluxA = this.fluxA;
   
   this.emf = motor.state.angVel * motor.params.kv;
   if (this.drivetype == 'current') {
