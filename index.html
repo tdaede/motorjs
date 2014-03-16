@@ -192,7 +192,7 @@
           vectorDraw(ctx, a_ref.x(-1));
           ctx.strokeStyle = "#000000";
           ctx.lineWidth = 4;
-          vectorDraw(ctx, a);
+          vectorDraw(ctx, a_ref.x(motor.fluxA/motor.fluxPeak));
           ctx.translate(-1*outerRadius,0);
           ctx.rotate(Math.PI*2/3 / motor.params.polePairs);
           ctx.translate(outerRadius,0);
@@ -202,7 +202,7 @@
           vectorDraw(ctx, a_ref.x(-1));
           ctx.strokeStyle = "#000000";
           ctx.lineWidth = 4;
-          vectorDraw(ctx, b.rotate(Math.PI*(-2/3),center));
+          vectorDraw(ctx, a_ref.x(motor.fluxB/motor.fluxPeak));
           ctx.translate(-1*outerRadius,0);
           ctx.rotate(Math.PI*2/3 / motor.params.polePairs);
           ctx.translate(outerRadius,0);
@@ -212,7 +212,7 @@
           vectorDraw(ctx, a_ref.x(-1));
           ctx.strokeStyle = "#000000";
           ctx.lineWidth = 4;
-          vectorDraw(ctx, c.rotate(Math.PI*(-4/3),center));
+          vectorDraw(ctx, a_ref.x(motor.fluxC/motor.fluxPeak));
           ctx.translate(-1*outerRadius,0);
           ctx.rotate(Math.PI*2/3 / motor.params.polePairs);
         }
