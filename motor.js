@@ -51,8 +51,17 @@ function angleDifference(x, y) {
 }
 
 motor.lookupFlux = function(theta) {
-  var i = Math.floor((Math.abs(theta) % (Math.PI*2))/2/Math.PI*this.thetaPrecision);
-  return this.fluxALookup[i];
+  var i = (Math.abs(theta) % (Math.PI*2))/2/Math.PI*this.thetaPrecision;
+  var j = Math.floor(i);
+  var k = i % 1;
+  return this.fluxALookup[j]*(1-k) + this.fluxALookup[j+1]*k;
+}
+
+motor.lookupEmf = function(theta) {
+  var i = (Math.abs(theta) % (Math.PI*2))/2/Math.PI*this.thetaPrecision;
+  var j = Math.floor(i);
+  var k = i % 1;
+  return this.emfALookup[j]*(1-k) + this.emfALookup[j+1]*k;
 }
 
 motor.regenerate = function() {
@@ -71,6 +80,7 @@ motor.regenerate = function() {
     this.magnets.push(magnet);
   }
   this.fluxALookup = [];
+  this.emfALookup = [];
   this.thetaPrecision = 200; // number of lookup points for flux table
   for (var thetaIndex = 0; thetaIndex < this.thetaPrecision; thetaIndex++) {
     var theta = Math.PI * 2 * thetaIndex / this.thetaPrecision;
@@ -93,6 +103,10 @@ motor.regenerate = function() {
       }
     this.fluxALookup.push(coils[0].flux);  
   }
+  for (var thetaIndex = 0; thetaIndex < (this.thetaPrecision-1); thetaIndex++) {
+    this.emfALookup.push((this.fluxALookup[thetaIndex+1] - this.fluxALookup[thetaIndex]));
+  }
+  this.emfALookup.push(this.emfALookup[this.thetaPrecision-1]);
 };  
 
 motor.update = function (dt) {
@@ -101,7 +115,8 @@ motor.update = function (dt) {
   
   //this.fluxA = coils[0].flux;
   this.fluxA = this.lookupFlux(motor.state.theta);
-  this.emfA = (this.fluxA - this.lastFluxA)*dt;
+  //this.emfA = (this.fluxA - this.lastFluxA)*dt;
+  this.emfA = this.lookupEmf(motor.state.theta)*motor.state.angVel;
   this.lastFluxA = this.fluxA;
   
   this.emf = motor.state.angVel * motor.params.kv;
