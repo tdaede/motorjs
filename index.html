@@ -90,13 +90,21 @@
 		scene.add(rotor);
 		camera.position.z = 10;
 	  }
-    function updateMotor() {
+    function motorGeometryChanged() {
+      updateMotorParams();
+      motor.regenerate();
+    }
+    function updateMotorParams() {
       var form = document.forms['motor'];
       motor.params.polePairs = parseInt(form.elements['polePairs'].value);
       motor.params.kv = parseFloat(form.elements['kv'].value);
       motor.params.kt = motor.params.kv;
       motor.params.Rs = parseFloat(form.elements['rs'].value);
       motor.params.magnetArc = parseFloat($('#magnet-arc').val()) * Math.PI;
+    }
+    function updateMotor() {
+      var form = document.forms['motor'];
+      updateMotorParams();
       motor.loadtorque = parseFloat(form.elements['loadtorque'].value);
       motor.iq = parseInt(form.elements['iq'].value);
       motor.vq = parseFloat(form.elements['vq'].value);
@@ -146,7 +154,9 @@
     }
 	  function init() {
 	    window.requestAnimationFrame(draw);
+      motorGeometryChanged();
       init3D();
+      $('#polePairs').change(motorGeometryChanged);
     }
 	  var lasttime = null;
     function draw(timestamp){

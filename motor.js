@@ -50,8 +50,14 @@ function angleDifference(x, y) {
   return Math.atan2(Math.sin(x-y), Math.cos(x-y))
 }
 
+motor.lookupFlux = function(theta) {
+  var i = Math.floor((Math.abs(theta) % (Math.PI*2))/2/Math.PI*this.thetaPrecision);
+  return this.fluxALookup[i];
+}
+
 motor.regenerate = function() {
   var polePairs = motor.params.polePairs;
+  var numWindings = 3 * motor.params.polePairs;
   this.magnets = [];
   
   for (var i = 0; i < (polePairs*2); i++) {
@@ -64,32 +70,37 @@ motor.regenerate = function() {
     }
     this.magnets.push(magnet);
   }
-}  
+  this.fluxALookup = [];
+  this.thetaPrecision = 200; // number of lookup points for flux table
+  for (var thetaIndex = 0; thetaIndex < this.thetaPrecision; thetaIndex++) {
+    var theta = Math.PI * 2 * thetaIndex / this.thetaPrecision;
+      var coils = [];
+      var coilWidth = Math.PI/numWindings;
+      var magnetWidth = motor.params.magnetArc/polePairs;
+      for (var i = 0; i < (numWindings); i++) {
+        var coil = new Object();
+        coil.center = i * Math.PI * 2 / 3 / polePairs;
+        coil.flux = 0;
+        for (var j = coilWidth/-2; j < coilWidth/2; j += 0.01) {
+          var location = j + coil.center;
+          for (magnetNum in this.magnets) {
+            if (Math.abs(angleDifference(location,this.magnets[magnetNum].center + theta)) < magnetWidth / 2) {
+              coil.flux += this.magnets[magnetNum].B;
+            }
+          }
+        }
+        coils.push(coil);
+      }
+    this.fluxALookup.push(coils[0].flux);  
+  }
+};  
 
 motor.update = function (dt) {
-  this.regenerate();
   var numWindings = 3 * motor.params.polePairs;
   var polePairs = motor.params.polePairs;
   
-  var coils = [];
-  var coilWidth = Math.PI/numWindings;
-  var magnetWidth = motor.params.magnetArc/polePairs;
-  for (var i = 0; i < (numWindings); i++) {
-    var coil = new Object();
-    coil.center = i * Math.PI * 2 / 3 / polePairs;
-    coil.flux = 0;
-    for (var j = coilWidth/-2; j < coilWidth/2; j += 0.01) {
-      var location = j + coil.center;
-      for (magnetNum in this.magnets) {
-        if (Math.abs(angleDifference(location,this.magnets[magnetNum].center + motor.state.theta)) < magnetWidth / 2) {
-          coil.flux += this.magnets[magnetNum].B;
-        }
-      }
-    }
-    coils.push(coil);
-  }
-  
-  this.fluxA = coils[0].flux;
+  //this.fluxA = coils[0].flux;
+  this.fluxA = this.lookupFlux(motor.state.theta);
   this.emfA = (this.fluxA - this.lastFluxA)*dt;
   this.lastFluxA = this.fluxA;
   
