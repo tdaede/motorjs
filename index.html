@@ -230,14 +230,14 @@
 		  ctx.lineWidth = 10;
           ctx.strokeStyle = "#FF0000";
           ctx.beginPath();
-          ctx.arc(0,0,30,0,motor.params.magnetArc/motor.params.polePairs);
+          ctx.arc(0,0,30,motor.params.magnetArc/motor.params.polePairs/-2,motor.params.magnetArc/motor.params.polePairs/2);
           ctx.stroke();
           ctx.closePath();
           //ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
           ctx.rotate(Math.PI / motor.params.polePairs);
           ctx.strokeStyle = "#0000FF";
           ctx.beginPath();
-          ctx.arc(0,0,30,0,motor.params.magnetArc/motor.params.polePairs);
+          ctx.arc(0,0,30,motor.params.magnetArc/motor.params.polePairs/-2,motor.params.magnetArc/motor.params.polePairs/2);
           ctx.stroke();
           ctx.closePath();
           //ctx.fillRect(-25 / motor.params.polePairs,25,50 / motor.params.polePairs,10);
