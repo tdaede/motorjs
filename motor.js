@@ -88,10 +88,11 @@ motor.regenerate = function() {
       var coils = [];
       var coilWidth = Math.PI/numWindings;
       var magnetWidth = motor.params.magnetArc/polePairs;
-      for (var i = 0; i < 1; i++) {
+      for (var i = 0; i < numWindings; i++) {
         var coil = new Object();
         coil.center = i * Math.PI * 2 / 3 / polePairs;
         coil.flux = 0;
+        coil.width = coilWidth;
         for (var j = coilWidth/-2; j < coilWidth/2; j += 0.01) {
           var location = j + coil.center;
           for (magnetNum in this.magnets) {
@@ -105,6 +106,7 @@ motor.regenerate = function() {
       }
     this.fluxALookup.push(coils[0].flux);  
   }
+  this.coils = coils;
   // emf of a phase is the emf of all its series coils
   for (var thetaIndex = 0; thetaIndex < (this.thetaPrecision-1); thetaIndex++) {
     this.emfALookup.push((this.fluxALookup[thetaIndex+1] - this.fluxALookup[thetaIndex])*polePairs);
