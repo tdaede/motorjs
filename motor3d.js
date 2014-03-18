@@ -10,11 +10,19 @@ motor3d.renderer.setSize( 300,300 );
 motor3d.renderer.setClearColor(0xFFFFFF, 1);
 
 motor3d.createRotor = function() {
-  this.rotor = new THREE.Object3D();
+  var rotor = new THREE.Object3D();
+  /*
   this.loader.load( 'obj/d1_ee_motor_rotor_may23.obj', function ( object ) {
     object.rotateOnAxis(new THREE.Vector3(0,-1,0), Math.PI/2);
     motor3d.rotor.add( object );
   } );
+  */
+  var steel = new THREE.MeshLambertMaterial( { color: 0x7F7F7F, transparent: true, opacity: 0.4});
+  var rotorDiskGeometry = new THREE.CylinderGeometry(5,5,0.5,40);
+  var rotorDisk = new THREE.Mesh(rotorDiskGeometry, steel);
+  rotorDisk.rotateOnAxis(new THREE.Vector3(1,0,0), Math.PI/2);
+  rotorDisk.translateY(0.75);
+  rotor.add(rotorDisk);
   var magnet_geometry = new THREE.CubeGeometry(1,1,1);
   var magnet_north_material = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
   var magnet_south_material = new THREE.MeshLambertMaterial( { color: 0x0000FF } );
@@ -22,20 +30,27 @@ motor3d.createRotor = function() {
     var north = new THREE.Mesh( magnet_geometry, magnet_north_material );
     north.rotateOnAxis(new THREE.Vector3(0,0,1), (i/motor.params.polePairs)*2*Math.PI);
     north.translateX(4.5);
-    this.rotor.add( north );
+    rotor.add( north );
     var south = new THREE.Mesh( magnet_geometry, magnet_south_material );
     south.rotateOnAxis(new THREE.Vector3(0,0,1), (i/motor.params.polePairs+(0.5/motor.params.polePairs))*2*Math.PI);
     south.translateX(4.5);
-    this.rotor.add( south );
+    rotor.add( south );
   }
-  this.scene.add(this.rotor);
+  return rotor;
+}
+
+motor3d.createStator = function() {
+  var stator = new THREE.Object3D();
+  var copper = new THREE.MeshLambertMaterial( {color: 0x7F0000} );
+  var coilGeometry = new THREE.TorusGeometry(5,0.5, 20,40);
+  var coil = new THREE.Mesh(coilGeometry, copper);
+  stator.add(coil);
+  return stator;
 }
 
 motor3d.init = function() {
   $("#silly-3d").append( this.renderer.domElement );
   this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
-  var form = document.forms['motor'];
-  motor.params.polePairs = parseInt(form.elements['polePairs'].value);
   
   var scene = this.scene;
   var light;
@@ -53,12 +68,25 @@ motor3d.init = function() {
 };
 
 motor3d.regenerate = function() {
-  this.scene.remove(this.rotor);
-  this.createRotor();
+  this.scene.remove(this.rotor1);
+  this.scene.remove(this.rotor2);
+  this.rotor1 = this.createRotor();
+  this.rotor1.translateZ(1);
+  this.scene.add(this.rotor1);
+  
+  this.scene.remove(this.stator);
+  this.stator = this.createStator();
+  this.scene.add(this.stator);
+  /*
+  this.rotor2 = this.createRotor();
+  this.rotor2.rotateOnAxis(new THREE.Vector3(1,0,0), Math.PI);
+  this.scene.add(this.rotor2);
+  */
 };
 
 
 motor3d.draw = function() {
-  this.rotor.rotation = new THREE.Euler(0,0, motor.state.theta, 'XYZ');
+  this.rotor1.rotation = new THREE.Euler(0,0, motor.state.theta, 'XYZ');
+  /*this.rotor2.rotation = new THREE.Euler(0,0, motor.state.theta, 'XYZ');*/
   this.renderer.render(this.scene, this.camera);
 };
