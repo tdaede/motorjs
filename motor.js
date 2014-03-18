@@ -105,8 +105,9 @@ motor.regenerate = function() {
       }
     this.fluxALookup.push(coils[0].flux);  
   }
+  // emf of a phase is the emf of all its series coils
   for (var thetaIndex = 0; thetaIndex < (this.thetaPrecision-1); thetaIndex++) {
-    this.emfALookup.push((this.fluxALookup[thetaIndex+1] - this.fluxALookup[thetaIndex]));
+    this.emfALookup.push((this.fluxALookup[thetaIndex+1] - this.fluxALookup[thetaIndex])*polePairs);
   }
   this.emfALookup.push(this.emfALookup[this.thetaPrecision-1]);
 };  
