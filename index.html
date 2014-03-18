@@ -188,7 +188,7 @@
           ctx.strokeStyle = "#CFCFCF";
           ctx.lineWidth = 10;
           ctx.beginPath();
-          ctx.arc(0,0,75,coil.center-coil.width/2, coil.center+coil.width/2);
+          ctx.arc(0,0,40,coil.center-coil.width/2, coil.center+coil.width/2);
           ctx.stroke();
           ctx.closePath();
         }
@@ -231,7 +231,7 @@
           ctx.rotate(Math.PI*2/3 / motor.params.polePairs);
         }
         ctx.restore();
-        ctx.rotate(motor.state.theta-Math.PI/2);
+        ctx.rotate(motor.state.theta);
        
         
         // magnets
@@ -240,7 +240,7 @@
         ctx.stroke();
         ctx.closePath();
         for (var i = 0; i < motor.params.polePairs; i++) {
-		  ctx.lineWidth = 10;
+          ctx.lineWidth = 10;
           ctx.strokeStyle = "#FF0000";
           ctx.beginPath();
           ctx.arc(0,0,30,motor.params.magnetArc/motor.params.polePairs/-2,motor.params.magnetArc/motor.params.polePairs/2);

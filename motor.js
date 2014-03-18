@@ -96,7 +96,7 @@ motor.regenerate = function() {
         for (var j = coilWidth/-2; j < coilWidth/2; j += 0.01) {
           var location = j + coil.center;
           for (magnetNum in this.magnets) {
-            if (Math.abs(angleDifference(location,this.magnets[magnetNum].center + theta)) < magnetWidth / 2) {
+            if (Math.abs(angleDifference(location,this.magnets[magnetNum].center + theta)) < (magnetWidth / 2)) {
               coil.flux += this.magnets[magnetNum].B;
             }
           }
