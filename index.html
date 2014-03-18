@@ -50,6 +50,7 @@
     function motorGeometryChanged() {
       updateMotorParams();
       motor.regenerate();
+      motor3d.regenerate();
     }
     function updateMotorParams() {
       var form = document.forms['motor'];
@@ -108,7 +109,7 @@
 	  function init() {
 	    window.requestAnimationFrame(draw);
       motorGeometryChanged();
-      init3D();
+      motor3d.init();
       $('#polePairs').change(motorGeometryChanged);
       $('#magnet-arc').change(motorGeometryChanged);
     }
@@ -126,7 +127,7 @@
       var canvas = document.getElementById('tutorial');
       updateMotor();
       updateForms();
-      draw3D();
+      motor3d.draw();
       if (canvas.getContext){
         var ctx = canvas.getContext('2d');
         ctx.save();
