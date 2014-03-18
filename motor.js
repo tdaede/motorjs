@@ -122,8 +122,8 @@ motor.update = function (dt) {
   
   //this.fluxA = coils[0].flux;
   this.fluxA = this.lookupFlux(motor.state.theta);
-  this.fluxB = this.lookupFlux(motor.state.theta + Math.PI * 2/3 / motor.params.polePairs);
-  this.fluxC = this.lookupFlux(motor.state.theta + Math.PI * 4/3 / motor.params.polePairs);
+  this.fluxB = this.lookupFlux(motor.state.theta - Math.PI * 2/3 / motor.params.polePairs);
+  this.fluxC = this.lookupFlux(motor.state.theta - Math.PI * 4/3 / motor.params.polePairs);
   //this.emfA = (this.fluxA - this.lastFluxA)*dt;
   this.emfA = this.lookupEmf(motor.state.theta)*motor.state.angVel;
   this.lastFluxA = this.fluxA;
