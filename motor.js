@@ -140,7 +140,7 @@ motor.regenerate = function() {
   var phaseLength = (motor.params.outerRadius-motor.params.innerRadius)*2*polePairs*this.params.turns;
   var fill = 0.6;
   var resistivity = 1.68e-8;
-  this.rp = fill*resistivity*phaseLength/conductorArea;
+  this.rp = resistivity*phaseLength/conductorArea/fill;
   this.params.Rs = this.rp*2;
 };  
 
