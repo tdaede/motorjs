@@ -24,7 +24,7 @@ motor3d.createRotor = function() {
   } );
   */
   //var steel = new THREE.MeshLambertMaterial( { color: 0x7F7F7F, transparent: true, opacity: 0.4});
-  var steel = new THREE.MeshPhongMaterial( {color: 0x7F7F7F} );
+  var steel = new THREE.MeshPhongMaterial( {color: 0x7F7F7F, shading: THREE.SmoothShading} );
   var rotorDiskShape = new THREE.Shape();
   rotorDiskShape.moveTo(outerRadius,0);
   rotorDiskShape.absarc(0,0,outerRadius,0,Math.PI*2,true);

@@ -96,18 +96,21 @@ motor.regenerate = function() {
         coil.flux = 0;
         coil.width = coilWidth;
         coil.phase = i % 3;
-        var slice = 0.003;
-        var sliceArea = Math.PI*(motor.params.outerRadius*motor.params.outerRadius
-          -motor.params.innerRadius*motor.params.innerRadius)*slice/Math.PI/2;
-        for (var j = coilWidth/-2; j < coilWidth/2; j += slice) {
-          var location = j + coil.center;
-          for (magnetNum in this.magnets) {
-            if (Math.abs(angleDifference(location,this.magnets[magnetNum].center + theta)) < (magnetWidth / 2)) {
-              coil.flux += this.magnets[magnetNum].B*sliceArea;
+        // we assume symmetrical phases, offset only by 120 degrees
+        if (coil.phase == 0) {
+          var slice = 0.003;
+          var sliceArea = Math.PI*(motor.params.outerRadius*motor.params.outerRadius
+            -motor.params.innerRadius*motor.params.innerRadius)*slice/Math.PI/2;
+          for (var j = coilWidth/-2; j < coilWidth/2; j += slice) {
+            var location = j + coil.center;
+            for (magnetNum in this.magnets) {
+              if (Math.abs(angleDifference(location,this.magnets[magnetNum].center + theta)) < (magnetWidth / 2)) {
+                coil.flux += this.magnets[magnetNum].B*sliceArea;
+              }
             }
           }
+          if (coil.flux > this.fluxPeak) this.fluxPeak = coil.flux;
         }
-        if (coil.flux > this.fluxPeak) this.fluxPeak = coil.flux;
         coils.push(coil);
       }
     this.fluxALookup.push(coils[0].flux);  
