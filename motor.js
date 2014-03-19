@@ -123,6 +123,9 @@ motor.regenerate = function() {
     }
     this.emfALookup.push(emf);
   }
+  this.kt = this.ke; // FIXME
+  this.params.kv = this.ke;
+  this.params.kt = this.kt;
   this.emfALookup.push(this.emfALookup[this.thetaPrecision-1]);
   this.emfALookup.push(this.emfALookup[0]);
 };  
