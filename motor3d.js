@@ -5,7 +5,7 @@ motor3d.camera = new THREE.PerspectiveCamera( 75, 1, 0.01, 1000 );
 motor3d.manager = new THREE.LoadingManager();
 motor3d.loader = new THREE.OBJLoader( motor3d.manager );
 
-motor3d.renderer = new THREE.WebGLRenderer();
+motor3d.renderer = new THREE.WebGLRenderer({antialias: true});
 motor3d.renderer.setSize( 300,300 );
 motor3d.renderer.setClearColor(0xFFFFFF, 1);
 
