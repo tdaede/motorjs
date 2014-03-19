@@ -131,6 +131,17 @@ motor.regenerate = function() {
   this.params.kt = this.kt;
   this.emfALookup.push(this.emfALookup[this.thetaPrecision-1]);
   this.emfALookup.push(this.emfALookup[0]);
+  
+  // resistance computation
+  // figure out cross sectional area of conductor
+  var copperArea = motor.params.statorThickness * 2*Math.PI*motor.params.innerRadius;
+  var conductorArea = copperArea / numWindings / 2 / 3;
+  // FIXME: use actual end winding length instead of *2
+  var phaseLength = (motor.params.outerRadius-motor.params.innerRadius)*2*polePairs*this.params.turns;
+  var fill = 0.6;
+  var resistivity = 1.68e-8;
+  this.rp = fill*resistivity*phaseLength/conductorArea;
+  this.params.Rs = this.rp*2;
 };  
 
 motor.update = function (dt) {
