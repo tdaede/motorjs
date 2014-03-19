@@ -31,11 +31,11 @@ function updateFlux() {
 	updateMass();
 	var outerRadius = parseFloat($('#mw-or').val());
 	var innerRadius = parseFloat($('#mw-ir').val());
-	var turns = parseFloat($('#mw-turns').val());
+	var turns = motor.params.turns;
 	
 	var Br = 1.45;
 	var Hc = 891300;
-	var area = (Math.PI*outerRadius*outerRadius-Math.PI*innerRadius*innerRadius)
+	var area = (Math.PI*outerRadius*outerRadius-Math.PI*innerRadius*innerRadius)*Math.PI/motor.params.magnetArc;
 	$('#mw-area').html(area);
 	var Fm = Hc*magnetThickness;
 	var Rm = magnetThickness/((Br/Hc)*area);
@@ -43,6 +43,7 @@ function updateFlux() {
 	
 	var flux = Fm*2/(Rm*2+Rg);
 	$('#mw-flux').html(flux);
+	motor.airgapFluxDensity = flux / area;
 	
 	var field = flux / area;
 	$('#mw-field').html(field);

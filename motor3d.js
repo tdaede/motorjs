@@ -61,8 +61,8 @@ motor3d.createStator = function() {
   var stator = new THREE.Object3D();
   var copper = new THREE.MeshPhongMaterial( {color: 0xCA4400} );
   var coilShape = new THREE.Shape();
-  var innerRadius = parseFloat($('#mw-ir').val());
-  var outerRadius = parseFloat($('#mw-or').val());
+  var innerRadius = motor.params.innerRadius;
+  var outerRadius = motor.params.outerRadius;
   var statorThickness = parseFloat($('#mw-stator-thickness').val());
   var arcLength = Math.PI*1/3/motor.params.polePairs;
   coilShape.moveTo(innerRadius,0);

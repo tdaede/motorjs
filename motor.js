@@ -65,6 +65,7 @@ motor.lookupEmf = function(theta) {
 }
 
 motor.regenerate = function() {
+  updateFlux();
   var polePairs = motor.params.polePairs;
   var numWindings = 3 * motor.params.polePairs;
   this.magnets = [];
@@ -73,12 +74,13 @@ motor.regenerate = function() {
     var magnet = new Object();
     magnet.center = i * Math.PI / polePairs;
     if (i % 2) {
-      magnet.B = 1;
+      magnet.B = this.airgapFluxDensity;
     } else {
-      magnet.B = -1;
+      magnet.B = -1*this.airgapFluxDensity;
     }
     this.magnets.push(magnet);
   }
+  // generate lookup tables for one mechanical rotation at 1 rad/s
   this.fluxALookup = [];
   this.emfALookup = [];
   this.fluxPeak = 0;
@@ -93,11 +95,15 @@ motor.regenerate = function() {
         coil.center = i * Math.PI * 2 / 3 / polePairs;
         coil.flux = 0;
         coil.width = coilWidth;
-        for (var j = coilWidth/-2; j < coilWidth/2; j += 0.01) {
+        coil.phase = i % 3;
+        var slice = 0.003;
+        var sliceArea = Math.PI*(motor.params.outerRadius*motor.params.outerRadius
+          -motor.params.innerRadius*motor.params.innerRadius)*slice/Math.PI/2;
+        for (var j = coilWidth/-2; j < coilWidth/2; j += slice) {
           var location = j + coil.center;
           for (magnetNum in this.magnets) {
             if (Math.abs(angleDifference(location,this.magnets[magnetNum].center + theta)) < (magnetWidth / 2)) {
-              coil.flux += this.magnets[magnetNum].B;
+              coil.flux += this.magnets[magnetNum].B*sliceArea;
             }
           }
         }
@@ -109,8 +115,13 @@ motor.regenerate = function() {
   this.fluxALookup.push(this.fluxALookup[0]); // add extra entry for wraparound
   this.coils = coils;
   // emf of a phase is the emf of all its series coils
+  this.ke = 0;
   for (var thetaIndex = 0; thetaIndex < (this.thetaPrecision-1); thetaIndex++) {
-    this.emfALookup.push((this.fluxALookup[thetaIndex+1] - this.fluxALookup[thetaIndex])*polePairs);
+    var emf = (this.fluxALookup[thetaIndex+1] - this.fluxALookup[thetaIndex])/(2*Math.PI/this.thetaPrecision)*polePairs*this.params.turns;
+    if (this.ke < emf) {
+      this.ke = emf;
+    }
+    this.emfALookup.push(emf);
   }
   this.emfALookup.push(this.emfALookup[this.thetaPrecision-1]);
   this.emfALookup.push(this.emfALookup[0]);
