@@ -33,7 +33,7 @@ motor3d.createRotor = function() {
   rotorDiskCutout.absarc(0,0,innerRadius,0,Math.PI*2,true);
   rotorDiskShape.holes.push(rotorDiskCutout);
   //var rotorDiskGeometry = new THREE.CylinderGeometry(outerRadius,outerRadius,0.010,40);
-  var rotorDiskGeometry = new THREE.ExtrudeGeometry(rotorDiskShape, {amount: ironThickness, bevelEnabled: false});
+  var rotorDiskGeometry = new THREE.ExtrudeGeometry(rotorDiskShape, {amount: ironThickness, bevelEnabled: false, curveSegments:20});
   var rotorDisk = new THREE.Mesh(rotorDiskGeometry, steel);
   //rotorDisk.rotateOnAxis(new THREE.Vector3(1,0,0), Math.PI/2);
   rotorDisk.translateZ(statorThickness+magnetThickness+airgapThickness);
