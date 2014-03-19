@@ -17,7 +17,8 @@ motor3d.createRotor = function() {
     motor3d.rotor.add( object );
   } );
   */
-  var steel = new THREE.MeshLambertMaterial( { color: 0x7F7F7F, transparent: true, opacity: 0.4});
+  //var steel = new THREE.MeshLambertMaterial( { color: 0x7F7F7F, transparent: true, opacity: 0.4});
+  var steel = new THREE.MeshPhongMaterial( {color: 0x7F7F7F} );
   var rotorDiskGeometry = new THREE.CylinderGeometry(5,5,0.5,40);
   var rotorDisk = new THREE.Mesh(rotorDiskGeometry, steel);
   rotorDisk.rotateOnAxis(new THREE.Vector3(1,0,0), Math.PI/2);
@@ -41,10 +42,25 @@ motor3d.createRotor = function() {
 
 motor3d.createStator = function() {
   var stator = new THREE.Object3D();
-  var copper = new THREE.MeshLambertMaterial( {color: 0x7F0000} );
-  var coilGeometry = new THREE.TorusGeometry(5,0.5, 20,40);
-  var coil = new THREE.Mesh(coilGeometry, copper);
-  stator.add(coil);
+  var copper = new THREE.MeshPhongMaterial( {color: 0xCA4400} );
+  var coilShape = new THREE.Shape();
+  var innerRadius = 3;
+  var outerRadius = 6;
+  var arcLength = Math.PI*1/3/motor.params.polePairs;
+  coilShape.moveTo(innerRadius,0);
+  coilShape.lineTo(outerRadius,0);
+  //coilShape.absarc(0,0,outerRadius,0,arcLength,false);
+  coilShape.lineTo(outerRadius*Math.cos(arcLength),outerRadius*Math.sin(arcLength));
+  coilShape.lineTo(innerRadius*Math.cos(arcLength),innerRadius*Math.sin(arcLength));
+  coilShape.lineTo(innerRadius,0);
+  //coilShape.absarc(0,0,innerRadius,arcLength,0,true);
+  var coilGeometry = new THREE.ExtrudeGeometry(coilShape, {amount: 1, bevelEnabled: false, curveSegments: 8});
+  //var coilGeometry = new THREE.ShapeGeometry(coilShape);
+  for (coilNum in motor.coils) {
+    var coil = new THREE.Mesh(coilGeometry, copper);
+    coil.rotateOnAxis(new THREE.Vector3(0,0,1),motor.coils[coilNum].center);
+    stator.add(coil);
+  }
   return stator;
 }
 
@@ -71,7 +87,7 @@ motor3d.regenerate = function() {
   this.scene.remove(this.rotor1);
   this.scene.remove(this.rotor2);
   this.rotor1 = this.createRotor();
-  this.rotor1.translateZ(1);
+  this.rotor1.translateZ(2);
   this.scene.add(this.rotor1);
   
   this.scene.remove(this.stator);
