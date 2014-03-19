@@ -18,7 +18,7 @@ var defaultParams = {
   kt: 1,
   kv: 1,
   J: 1,
-  drag: 0.1,
+  drag: 0,
   Rs: 0.1
 };
 motor.params = defaultParams;
