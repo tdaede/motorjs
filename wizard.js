@@ -19,6 +19,7 @@ function updateMass() {
 	var numStators = 1;
 	var statorVolume = Math.PI*outerRadius*outerRadius*statorThickness;
 	var statorMass = statorVolume * copperDensity;
+	motor.statorMass = statorMass;
 	
 	var magnetDensity = 7500;
 	var magnetVolume = (Math.PI*outerRadius*outerRadius-Math.PI*innerRadius*innerRadius)*magnetThickness;
