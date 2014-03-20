@@ -50,19 +50,29 @@ function angleDifference(x, y) {
   return Math.atan2(Math.sin(x-y), Math.cos(x-y))
 }
 
+motor.ab = function(v){
+  var ab = $M([
+    [1, -1/2, -1/2],
+    [0, Math.sqrt(3)/2, Math.sqrt(3)/-2],
+    [1/Math.sqrt(2),1/Math.sqrt(2),1/Math.sqrt(2)]
+  ]);
+  ab = ab.x(Math.sqrt(2/3));
+  return ab.x(v);
+};
+
 motor.lookupFlux = function(theta) {
   var i = (angleDifference(0,theta)+Math.PI)/2/Math.PI*this.thetaPrecision;
   var j = Math.floor(i);
   var k = i % 1;
   return this.fluxALookup[j]*(1-k) + this.fluxALookup[j+1]*k;
-}
+};
 
 motor.lookupEmf = function(theta) {
   var i = (angleDifference(0,theta)+Math.PI)/2/Math.PI*this.thetaPrecision;
   var j = Math.floor(i);
   var k = i % 1;
   return this.emfALookup[j]*(1-k) + this.emfALookup[j+1]*k;
-}
+};
 
 motor.regenerate = function() {
   updateFlux();
@@ -127,8 +137,8 @@ motor.regenerate = function() {
     this.emfALookup.push(emf);
   }
   this.kt = this.ke; // FIXME
-  this.params.kv = this.ke;
-  this.params.kt = this.kt;
+  this.params.kv = this.ke * 2; // this should be in peak L-L
+  this.params.kt = this.params.kv;
   this.emfALookup.push(this.emfALookup[this.thetaPrecision-1]);
   this.emfALookup.push(this.emfALookup[0]);
   
@@ -154,7 +164,9 @@ motor.update = function (dt) {
   this.fluxC = this.lookupFlux(motor.state.theta - Math.PI * 4/3 / motor.params.polePairs);
   //this.emfA = (this.fluxA - this.lastFluxA)*dt;
   this.emfA = this.lookupEmf(motor.state.theta)*motor.state.angVel;
-  this.lastFluxA = this.fluxA;
+  this.emfB = this.lookupEmf(motor.state.theta - Math.PI * 2/3 / motor.params.polePairs)*motor.state.angVel;
+  this.emfC = this.lookupEmf(motor.state.theta - Math.PI * 2/3 / motor.params.polePairs)*motor.state.angVel;
+  this.emfThree = $V([this.emfA,this.emfB,this.emfC]);
   
   this.emf = motor.state.angVel * motor.params.kv;
   if (this.drivetype == 'current') {
