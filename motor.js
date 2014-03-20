@@ -109,8 +109,8 @@ motor.regenerate = function() {
         // we assume symmetrical phases, offset only by 120 degrees
         if (coil.phase == 0) {
           var slice = 0.003;
-          var sliceArea = Math.PI*(motor.params.outerRadius*motor.params.outerRadius
-            -motor.params.innerRadius*motor.params.innerRadius)*slice/Math.PI/2;
+          var sliceArea = (motor.params.outerRadius*motor.params.outerRadius
+            -motor.params.innerRadius*motor.params.innerRadius)*slice/2;
           for (var j = coilWidth/-2; j < coilWidth/2; j += slice) {
             var location = j + coil.center;
             for (magnetNum in this.magnets) {
