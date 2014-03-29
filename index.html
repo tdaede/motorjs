@@ -46,11 +46,29 @@
         $("#iq-control").show();
       }
 	  }
-
+    function redrawWaveformGraph() {
+      var waveformData = [];
+      if ($('#waveform-y').val() == 'mag_field') {
+        for (var i in motor.fluxALookup) {
+          waveformData.push([Math.PI*2/motor.thetaPrecision*i,motor.fluxALookup[i]]);
+        }
+      } else {
+        for (var i in motor.emfALookup) {
+          waveformData.push([Math.PI*2/motor.thetaPrecision*i,motor.emfALookup[i]]);
+        }
+      }
+      $.plot($("#lookup-chart"),[waveformData], {
+        xaxis: {
+          min: 0,
+          max: Math.PI*2
+        },
+      });
+    }
     function motorGeometryChanged() {
       updateMotorParams();
       motor.regenerate();
       motor3d.regenerate();
+      redrawWaveformGraph();
     }
     function updateMotorParams() {
       var form = document.forms['motor'];
@@ -230,7 +248,7 @@
         
         ctx.restore();
       }
-      scope.draw();
+      //scope.draw();
 		  window.requestAnimationFrame(draw);
     }
     </script>
@@ -257,6 +275,21 @@
       </nav>
       <div class="row">
         <div class="col-sm-10">
+          <div id="lookup-chart" style="clear:both; height: 200px;"></div>
+        </div>
+        <div class="col-sm-2">
+            <div class="form-group">
+            <label>Y-axis</label>
+            <select class="form-control" id="waveform-y" onChange="redrawWaveformGraph()">
+              <option value="mag_field">Magnetic flux (a)</option>
+              <option value="ea">emf (a)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!--
+      <div class="row">
+        <div class="col-sm-10">
           <div id="scope-chart" style="clear:both; height: 200px;"></div>
         </div>
         <div class="col-sm-2">
@@ -274,6 +307,7 @@
           </div>
         </div>
       </div>
+      -->
       <div class="row">
       <div class="col-sm-4"><canvas id="tutorial" width="400" height="400"></canvas></div>
       <div class="col-sm-4" id="silly-3d"></div>
