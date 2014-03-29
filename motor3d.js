@@ -59,7 +59,7 @@ motor3d.createRotor = function() {
 
 motor3d.createStator = function() {
   var stator = new THREE.Object3D();
-  var copper = new THREE.MeshPhongMaterial( {color: 0xCA4400} );
+  var copper = new THREE.MeshPhongMaterial( {color: 0xCA4400, transparent:true, opacity: 0.8} );
   var coilShape = new THREE.Shape();
   var innerRadius = motor.params.innerRadius;
   var outerRadius = motor.params.outerRadius;
