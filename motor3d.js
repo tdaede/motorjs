@@ -64,17 +64,19 @@ motor3d.createStator = function() {
   var innerRadius = motor.params.innerRadius;
   var outerRadius = motor.params.outerRadius;
   var statorThickness = parseFloat($('#mw-stator-thickness').val());
-  var arcLength = Math.PI*1/3/motor.params.polePairs;
+  //var arcLength = Math.PI*1/3/motor.params.polePairs;
+  var arcLength = motor.coils[0].width;
   var conductorArcLength = arcLength;
-  var conductorWidth = arcLength * motor.params.innerRadius;
+  var conductorWidth = statorThickness;
   var coilOuterRadius = outerRadius + conductorWidth/2;
   var coilInnerRadius = innerRadius - conductorWidth/2;
   coilShape.moveTo(innerRadius,0);
   coilShape.lineTo(outerRadius,0);
-  coilShape.lineTo(outerRadius*Math.cos(arcLength),outerRadius*Math.sin(arcLength));
+  //coilShape.lineTo(outerRadius*Math.cos(arcLength),outerRadius*Math.sin(arcLength));
+  coilShape.absarc(0,0,outerRadius,0,arcLength,true);
   coilShape.lineTo(innerRadius*Math.cos(arcLength),innerRadius*Math.sin(arcLength));
-  coilShape.lineTo(innerRadius,0);
-  /*
+  coilShape.absarc(0,0,innerRadius,0,arcLength,false);
+  //coilShape.lineTo(innerRadius,0);
   var coilSpline = new THREE.SplineCurve3([
     new THREE.Vector3(innerRadius,0,0),
     new THREE.Vector3(outerRadius,0,0),
@@ -86,13 +88,13 @@ motor3d.createStator = function() {
     new THREE.Vector3(coilInnerRadius*Math.cos(arcLength*1/4),coilInnerRadius*Math.sin(arcLength*1/4),0),
     new THREE.Vector3(innerRadius,0,0)
   ]);
-  */
   var coilGeometry = new THREE.ExtrudeGeometry(coilShape, {amount: statorThickness, bevelEnabled: false, curveSegments: 8});
   //var coilGeometry = new THREE.TubeGeometry(coilSpline,64,statorThickness,8,true);
   //var coilGeometry = new THREE.ShapeGeometry(coilShape);
   for (coilNum in motor.coils) {
     var coil = new THREE.Mesh(coilGeometry, copper);
     coil.rotateOnAxis(new THREE.Vector3(0,0,1),motor.coils[coilNum].center);
+    coil.translateZ(motor.coils[coilNum].phase*statorThickness*-1);
     stator.add(coil);
   }
   return stator;

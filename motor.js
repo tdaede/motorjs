@@ -94,7 +94,8 @@ motor.regenerate = function() {
   this.fluxALookup = [];
   this.emfALookup = [];
   this.fluxPeak = 0;
-  var coilWidth = Math.PI/numWindings;
+  //var coilWidth = Math.PI/numWindings;
+  var coilWidth = Math.PI/polePairs;
   this.thetaPrecision = 200; // number of lookup points for flux table
   for (var thetaIndex = 0; thetaIndex < this.thetaPrecision; thetaIndex++) {
     var theta = Math.PI * 2 * thetaIndex / this.thetaPrecision;
@@ -119,18 +120,25 @@ motor.regenerate = function() {
               }
             }
           }
-          if (coil.flux > this.fluxPeak) this.fluxPeak = coil.flux;
         }
         coils.push(coil);
       }
-    this.fluxALookup.push(coils[0].flux);  
+    var flux = 0;
+    for (var coilNum in coils) {
+      var coil = coils[coilNum];
+      if (coil.phase == 0) {
+        flux = flux + coil.flux;
+      }
+    }
+    if (flux > this.fluxPeak) this.fluxPeak = flux;
+    this.fluxALookup.push(flux);  
   }
   this.fluxALookup.push(this.fluxALookup[0]); // add extra entry for wraparound
   this.coils = coils;
   // emf of a phase is the emf of all its series coils
   this.ke = 0;
   for (var thetaIndex = 0; thetaIndex < (this.thetaPrecision-1); thetaIndex++) {
-    var emf = (this.fluxALookup[thetaIndex+1] - this.fluxALookup[thetaIndex])/(2*Math.PI/this.thetaPrecision)*polePairs*this.params.turns;
+    var emf = (this.fluxALookup[thetaIndex+1] - this.fluxALookup[thetaIndex])/(2*Math.PI/this.thetaPrecision)*this.params.turns;
     if (this.ke < emf) {
       this.ke = emf;
     }

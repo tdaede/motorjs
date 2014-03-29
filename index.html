@@ -140,12 +140,15 @@
         ctx.save();
         for(coilIndex in motor.coils) {
           var coil = motor.coils[coilIndex];
-          ctx.strokeStyle = "#CFCFCF";
-          ctx.lineWidth = 10;
-          ctx.beginPath();
-          ctx.arc(0,0,40,coil.center-coil.width/2, coil.center+coil.width/2);
-          ctx.stroke();
-          ctx.closePath();
+          if(true) {
+            ctx.strokeStyle = "#CFCFCF";
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            var phase = coil.phase;
+            ctx.arc(0,0,40+5*phase,coil.center-coil.width/2, coil.center+coil.width/2);
+            ctx.stroke();
+            ctx.closePath();
+          }
         }
         ctx.restore();
         
