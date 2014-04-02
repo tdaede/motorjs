@@ -49,15 +49,28 @@
     function redrawWaveformGraph() {
       var waveformData = [];
       if ($('#waveform-y').val() == 'mag_field') {
+        waveformData[0] = [];
         for (var i in motor.fluxALookup) {
-          waveformData.push([Math.PI*2/motor.thetaPrecision*i,motor.fluxALookup[i]]);
+          waveformData[0].push([Math.PI*2/motor.thetaPrecision*i,motor.fluxALookup[i]]);
         }
-      } else {
+      } else if ($('#waveform-y').val() == 'ea') {
+        waveformData[0] = [];
+        waveformData[1] = [];
+        waveformData[2] = [];
         for (var i in motor.emfALookup) {
-          waveformData.push([Math.PI*2/motor.thetaPrecision*i,motor.emfALookup[i]]);
+          var theta = Math.PI*2/motor.thetaPrecision*i;
+          waveformData[0].push([theta,motor.lookupEmf(theta)]);
+          waveformData[1].push([theta,motor.lookupEmf(theta - Math.PI * 2/3)]);
+          waveformData[2].push([theta,motor.lookupEmf(theta - Math.PI * 4/3)]);
+        } 
+      } else {
+        waveformData[0] = [];
+        for (var i in motor.emfALookup) {
+          var theta = Math.PI*2/motor.thetaPrecision*i;
+          waveformData[0].push([theta,motor.lookupEmf(theta)-motor.lookupEmf(theta - Math.PI * 2/3)]);
         }
       }
-      $.plot($("#lookup-chart"),[waveformData], {
+      $.plot($("#lookup-chart"),waveformData, {
         xaxis: {
           min: 0,
           max: Math.PI*2
@@ -283,6 +296,7 @@
             <select class="form-control" id="waveform-y" onChange="redrawWaveformGraph()">
               <option value="mag_field">Magnetic flux (a)</option>
               <option value="ea">emf (a)</option>
+              <option value="eab">emf (a-b)</option>
             </select>
           </div>
         </div>

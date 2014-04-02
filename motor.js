@@ -147,7 +147,7 @@ motor.regenerate = function() {
   this.kt = this.ke; // FIXME
   this.params.kv = this.ke * 2; // this should be in peak L-L
   this.params.kt = this.params.kv;
-  this.emfALookup.push(this.emfALookup[this.thetaPrecision-1]);
+  this.emfALookup.push(this.emfALookup[this.thetaPrecision-2]);
   this.emfALookup.push(this.emfALookup[0]);
   
   // resistance computation
