@@ -216,3 +216,9 @@ motor.update = function (dt) {
   var heat = this.iq*this.iq*this.params.Rs - (this.state.temp - 25)/this.thermalResistance;
   this.state.temp = this.state.temp + heat / this.heatCapacity * dt;
 }
+
+motor.reset = function () {
+  this.state.angVel = 0;
+  this.state.theta = 0;
+  this.state.temp = 25;
+};
