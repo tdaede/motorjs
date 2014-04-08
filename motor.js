@@ -109,7 +109,7 @@ motor.regenerate = function() {
         coil.phase = i % 3;
         // we assume symmetrical phases, offset only by 120 degrees
         if (coil.phase == 0) {
-          var slice = 0.003;
+          var slice = 0.002; // quality of sampling of flux
           var sliceArea = (motor.params.outerRadius*motor.params.outerRadius
             -motor.params.innerRadius*motor.params.innerRadius)*slice/2;
           for (var j = coilWidth/-2; j < coilWidth/2; j += slice) {
