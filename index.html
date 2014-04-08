@@ -127,6 +127,8 @@
 
       $("#resistanceloss").html((motor.iq*motor.iq*motor.params.Rs).toFixed(2));
       $("#bearingloss").html((motor.state.angVel*motor.params.drag*motor.state.angVel).toFixed(2));
+	  
+	  $("#temp").html(motor.state.temp.toFixed(2));
       
       if (motor.motor_t * motor.state.angVel > 0) {
         $("#region").html("Motoring");
@@ -335,6 +337,7 @@
       <tr><td>Electrical Power: </td><td id="power"></td><td>W</td></tr>
       <tr><td>Mechanical Power: </td><td id="mechpower"></td><td>W</td></tr>
       <tr><td>Resistance loss: </td><td id="resistanceloss"></td><td>W</td></tr>
+	  <tr><td>Temperature: </td><td id="temp"></td><td>C</td></tr>
       <tr><td>Efficiency: </td><td id="efficiency"></td><td>%</td></tr>
       <tr><td>Operation region: </td><td id="region"></td><td></td></tr>
       </table>

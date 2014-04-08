@@ -7,6 +7,7 @@ var motor = {
 motor.state = new Object();
 motor.state.theta = 0;
 motor.state.angVel = 0.5;
+motor.state.temp = 25;
 
 var load = new Object();
 load.car = new Object();
@@ -163,6 +164,9 @@ motor.regenerate = function() {
   var resistivity = 1.68e-8;
   this.rp = resistivity*phaseLength/conductorArea/fill;
   this.params.Rs = this.rp*2;
+  
+  this.heatCapacity = 10;
+  this.thermalResistance = 1;
 };  
 
 motor.update = function (dt) {
@@ -208,4 +212,7 @@ motor.update = function (dt) {
   
   this.state.theta += this.state.angVel*dt;
   this.state.e_theta = (this.state.theta * this.params.polePairs) % (Math.PI * 2);
+  
+  var heat = this.iq*this.iq*this.params.Rs - (this.state.temp - 25)/this.thermalResistance;
+  this.state.temp = this.state.temp + heat / this.heatCapacity * dt;
 }
