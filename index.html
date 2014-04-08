@@ -60,8 +60,8 @@
         for (var i in motor.emfALookup) {
           var theta = Math.PI*2/motor.thetaPrecision*i;
           waveformData[0].push([theta,motor.lookupEmf(theta)]);
-          waveformData[1].push([theta,motor.lookupEmf(theta - Math.PI * 2/3)]);
-          waveformData[2].push([theta,motor.lookupEmf(theta - Math.PI * 4/3)]);
+          waveformData[1].push([theta,motor.lookupEmf(theta - Math.PI * 2/3 / motor.params.polePairs)]);
+          waveformData[2].push([theta,motor.lookupEmf(theta - Math.PI * 4/3 / motor.params.polePairs)]);
         } 
       } else {
         waveformData[0] = [];
