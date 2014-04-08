@@ -151,9 +151,10 @@ motor.regenerate = function() {
   this.emfALookup.push(this.emfALookup[0]);
   
   // resistance computation
-  // figure out cross sectional area of conductor
+  // assume full fill at ID
   var copperArea = motor.params.statorThickness * 2*Math.PI*motor.params.innerRadius;
-  var conductorArea = copperArea / numWindings / 2 / 3;
+  // divide by two beacuse one coil goes out and in
+  var conductorArea = copperArea / numWindings / 2;
   // FIXME: use actual end winding length instead of *2
   var phaseLength = (motor.params.outerRadius-motor.params.innerRadius)*2;
   phaseLength = phaseLength + (motor.params.innerRadius+motor.params.outerRadius)*coilWidth;
