@@ -93,6 +93,18 @@
       motor.params.statorThickness = parseFloat($('#mw-stator-thickness').val());
       motor.params.turns = parseFloat($('#mw-turns').val());
     }
+    function reverseUpdateMotorParams() {
+      $('#polePairs').val(motor.params.polePairs);
+      $('#magnet-arc').val(motor.params.magnetArc / Math.PI);
+      $('#mw-ir').val(motor.params.innerRadius);
+      $('#mw-or').val(motor.params.outerRadius);
+      $('#mw-stator-thickness').val(motor.params.statorThickness);
+      $('mw-turns').val(motor.params.turns);
+    }
+    function loadMotorSettings() {
+      motor.params = JSON.parse($("#loadsave-text").val());
+      reverseUpdateMotorParams();
+    }
     function updateMotor() {
       var form = document.forms['motor'];
       updateMotorParams();
@@ -461,7 +473,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default">Close</button>
-            <button type="button" class="btn btn-primary">Load</button>
+            <button type="button" class="btn btn-primary" onClick="loadMotorSettings()">Load</button>
           </div>
         </div>
       </div>
