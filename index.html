@@ -41,9 +41,15 @@
       if (form.elements['drivetype'].value == 'voltage') {
         $("#vq-control").show();
         $("#iq-control").hide();
-      } else {
+        $("#iq-control-torque").hide();
+      } else if (form.elements['drivetype'].value == 'current') {
         $("#vq-control").hide();
         $("#iq-control").show();
+        $("#iq-control-torque").hide();
+      } else {
+        $("#vq-control").hide();
+        $("#iq-control").hide();
+        $("#iq-control-torque").show();
       }
 	  }
     function redrawWaveformGraph() {
@@ -111,6 +117,7 @@
       motor.loadtorque = parseFloat(form.elements['loadtorque'].value);
       motor.iq = parseInt(form.elements['iq'].value);
       motor.vq = parseFloat(form.elements['vq'].value);
+      motor.targetTorque = parseFloat(form.elements['iq-torque'].value);
       motor.loadVel = parseFloat(form.elements['angVel'].value);
       motor.loadtype = form.elements['loadtype'].value;
       motor.drivetype = form.elements['drivetype'].value;
@@ -437,11 +444,15 @@
               <label>Drive type:</label>
               <select name="drivetype" class="form-control">
                 <option value="current">Current</option>
+                <option value="torque">Torque</option>
                 <option value="voltage">Voltage</option>
               </select>
             </div>
             <div class="form-group" id="iq-control">
               <label>Q-axis current:</label><input type="range" name="iq" min="-100" max="100" value="0">
+            </div>
+            <div class="form-group" id="iq-control-torque">
+              <label>Torque:</label><input type="range" name="iq-torque" min="-100" max="100" value="0">
             </div>
             <div class="form-group" id="vq-control">
               <label>Q-axis voltage:</label><input type="range" name="vq" min="-100" max="100" value="0">

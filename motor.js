@@ -186,6 +186,9 @@ motor.update = function (dt) {
   this.emf = motor.state.angVel * motor.params.kv;
   if (this.drivetype == 'current') {
     this.vq = this.emf + this.iq * this.params.Rs;
+  } else if (this.drivetype == 'torque') {
+    this.iq = this.targetTorque / this.kt / 2;
+    this.vq = this.emf + this.iq * this.params.Rs;
   } else {
     this.iq = (this.vq - this.emf) / this.params.Rs;
   }
