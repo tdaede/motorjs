@@ -155,7 +155,7 @@ motor.regenerate = function() {
   // assume full fill at ID
   var copperArea = motor.params.statorThickness * 2*Math.PI*motor.params.innerRadius;
   // divide by two beacuse one coil goes out and in
-  var conductorArea = copperArea / numWindings / 2;
+  var conductorArea = copperArea / numWindings / 2 / this.params.turns;
   // FIXME: use actual end winding length instead of *2
   var phaseLength = (motor.params.outerRadius-motor.params.innerRadius)*2;
   phaseLength = phaseLength + (motor.params.innerRadius+motor.params.outerRadius)*coilWidth;
