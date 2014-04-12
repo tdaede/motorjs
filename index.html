@@ -82,6 +82,7 @@
       motor.regenerate();
       motor3d.regenerate();
       redrawWaveformGraph();
+      $("#loadsave-text").val(JSON.stringify(motor.params, null, "  "));
     }
     function updateMotorParams() {
       var form = document.forms['motor'];
@@ -347,7 +348,8 @@
           <div class="col-md-4">
             <h2>Motor settings:</h2>
             <div class="form-group">
-			  <button type="button" class="btn btn-default" onClick="motorGeometryChanged()">Recalculate</button>
+              <button type="button" class="btn btn-default" onClick="motorGeometryChanged()">Recalculate</button>
+        			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#loadsave">Load/save</button>
             </div>
             <!--<button type="button" onclick="resetMotor()">Reset</button>-->
             <div class="form-group">
@@ -447,6 +449,22 @@
         </form>
       </div>
     </div>
-  
+    <div class="modal fade" id="loadsave" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Load/save</h4>
+          </div>
+          <div class="modal-body">
+            <textarea id="loadsave-text" style="width: 100%; height: 400px;"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default">Close</button>
+            <button type="button" class="btn btn-primary">Load</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
