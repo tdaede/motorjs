@@ -166,7 +166,9 @@ motor.regenerate = function() {
   this.params.Rs = this.rp*2;
   
   this.heatCapacity = 10;
-  this.thermalResistance = 1;
+  this.surfaceArea = Math.PI*this.params.outerRadius*this.params.outerRadius-Math.PI*this.params.innerRadius*this.params.innerRadius;
+  this.surfaceArea = this.surfaceArea*2;
+  this.thermalResistance = 1/(10*this.surfaceArea);
 };  
 
 motor.update = function (dt) {
