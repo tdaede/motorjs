@@ -10,9 +10,10 @@ function updateMass() {
 	gapLength = parseFloat($('#mw-airgap').val());
 	statorThickness = parseFloat($('#mw-stator-thickness').val());
 	var rotorThickness = 0.005;
-	var rotorVolume = Math.PI*outerRadius*outerRadius*rotorThickness;
+	var rotorVolume = Math.PI*(outerRadius*outerRadius - innerRadius*innerRadius)*rotorThickness;
 	var steelDensity = 8050;
 	var rotorMass = rotorVolume * steelDensity;
+	motor.rotorMass = rotorMass;
 	var numRotors = 2;
 	
 	var copperDensity = 8960;
@@ -24,6 +25,7 @@ function updateMass() {
 	var magnetDensity = 7500;
 	var magnetVolume = (Math.PI*outerRadius*outerRadius-Math.PI*innerRadius*innerRadius)*magnetThickness;
 	magnetMass = magnetVolume * magnetDensity;
+	motor.magnetMass = magnetMass;
 	
 	$('#mw-mass').html(rotorMass*numRotors + statorMass*numStators + magnetMass*numRotors);
 }
